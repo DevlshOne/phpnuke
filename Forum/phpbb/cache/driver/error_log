@@ -1,0 +1,1 @@
+[23-Jul-2017 19:46:25 Asia/Tehran] PHP Fatal error:  Class 'phpbb\cache\driver\base' not found in /home/zohallco/sanoova.ir/Forum/phpbb/cache/driver/file.php on line 20
