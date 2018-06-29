@@ -110,7 +110,7 @@ $lang = array_merge($lang, array(
 	'ACP_AVATAR_SETTINGS_EXPLAIN'	=> 'نمایه ها یا ( آواتار ها )معمولا تصاویر کوچکی هستند که کاربران می توانند برای خود انتخاب کنند اندازه آنها به قالب مورد استفاده در تالار بستگی دارد و معمولا زیر نام کاربری نمایش داده می شوند. در این بخش می توانید معیار های انتخاب نمایه را برای کاربران مشخص کنید. لطفا توجه داشته باشید که دایرکتوری های مشخص شده در قسمت پایین باید ایجاد شده و سطح دسترسی نوشتن بر روی انها اعمال شود. همچنین توجه داشته باشید که این تنظیمات فقط برای نمایه ها هستند و سایر تصاویر ربطی به این بخش ندارد.',
 
 	'ALLOW_AVATARS'					=> 'فعال سازی نمایه',
-	'ALLOW_AVATARS_EXPLAIN'			=> 'پذیرفتن استفاده عمومی از آواتار؛<br />اگر نمایه ها را به کلی و یا برای حالت خاص غیر فعال کنید، دیگر نمایه ها در تالار نمایش داده نخواهند شد ولی کاربران خواهند توانست که نمایه های خودشان را از کنترل پنل کاربر بارگیری کنند.',
+	'ALLOW_AVATARS_EXPLAIN'			=> 'پذیرفتن استفاده عمومی از آواتار؛<br>اگر نمایه ها را به کلی و یا برای حالت خاص غیر فعال کنید، دیگر نمایه ها در تالار نمایش داده نخواهند شد ولی کاربران خواهند توانست که نمایه های خودشان را از کنترل پنل کاربر بارگیری کنند.',
 	'ALLOW_GRAVATAR'				=> 'فعال سازی نمایه گراواتار',
 	'ALLOW_LOCAL'					=> 'فعال سازی گالری نمایه',
 	'ALLOW_REMOTE'					=> 'فعال سازی نمایه از راه دور',
@@ -278,7 +278,7 @@ $lang = array_merge($lang, array(
 	'ACP_FEED_SETTINGS_OTHER'			=> 'سایر خوراک و تنظیمات',
 
 	'ACP_FEED_ENABLE'					=> 'فعال سازی خوراک',
-	'ACP_FEED_ENABLE_EXPLAIN'			=> 'می توانید خوراک ATOM را در سرتاسر تالار فعال و یا غیرفعال کنید.<br />غیرفعال کردن خوراک در سرتاسر تالار تنظیمات زیر را بی اثر خواهد کرد.',
+	'ACP_FEED_ENABLE_EXPLAIN'			=> 'می توانید خوراک ATOM را در سرتاسر تالار فعال و یا غیرفعال کنید.<br>غیرفعال کردن خوراک در سرتاسر تالار تنظیمات زیر را بی اثر خواهد کرد.',
 	'ACP_FEED_LIMIT'					=> 'تعداد موارد خوراک',
 	'ACP_FEED_LIMIT_EXPLAIN'			=> 'حداکثر تعداد موارد خوراک برای نمایش.',
 
@@ -294,7 +294,7 @@ $lang = array_merge($lang, array(
 	'ACP_FEED_TOPICS_ACTIVE'			=> 'فعال سازی خوراک موضوعات فعال',
 	'ACP_FEED_TOPICS_ACTIVE_EXPLAIN'	=> 'فعال سازی خوراک "موضوعات فعال" که شامل فعال ترین موضوعات است.',
 	'ACP_FEED_NEWS'						=> 'خوراک اخبار',
-	'ACP_FEED_NEWS_EXPLAIN'				=> 'اولین پست این انجمن ها را جای دهید برای غیرفعالل کردن،هیچ انجمنی را انتخاب نکنید.<br />با نگه داشتن <samp>CTRL</samp> و کلیک بر روی نام های انجمن ها می توانید به سادگی چند مورد را همزمان انتخاب و یا لغو انتخاب کنید.',
+	'ACP_FEED_NEWS_EXPLAIN'				=> 'اولین پست این انجمن ها را جای دهید برای غیرفعالل کردن،هیچ انجمنی را انتخاب نکنید.<br>با نگه داشتن <samp>CTRL</samp> و کلیک بر روی نام های انجمن ها می توانید به سادگی چند مورد را همزمان انتخاب و یا لغو انتخاب کنید.',
 
 	'ACP_FEED_OVERALL_FORUMS'			=> 'فعال سازی خوراک انجمن ها',
 	'ACP_FEED_OVERALL_FORUMS_EXPLAIN'	=> 'فعال سازی خوراک "همه انجمن ها" که لیستی از تمامی انجمن ها را نمایش می دهد.',
@@ -302,9 +302,9 @@ $lang = array_merge($lang, array(
 	'ACP_FEED_HTTP_AUTH'				=> 'پذیرفتن تایید HTTP',
 	'ACP_FEED_HTTP_AUTH_EXPLAIN'		=> 'ویژگی ای که به کاربران اجازه می دهد تا با اضافه کردن پارامتر <samp>auth=http</samp> به URL خوراک محتوایی را ببینند که برای مهمانان قابل مشاهده نیست. لطفا توجه داشته باشید که بعضی از نصب های PHP ممکن است برای اعمال این تنظیمات نیازمند تغییراتی در فایل .htaccess باشند.',
 	'ACP_FEED_ITEM_STATISTICS'			=> 'آمار هر مورد',
-	'ACP_FEED_ITEM_STATISTICS_EXPLAIN'	=> 'نمایش آمار مختلف در زیر هر مورد از خوراک<br />(برای مثال ارسال شده توسط، تاریخ و زمان، پاسخ ها، تعداد بازدید.)',
+	'ACP_FEED_ITEM_STATISTICS_EXPLAIN'	=> 'نمایش آمار مختلف در زیر هر مورد از خوراک<br>(برای مثال ارسال شده توسط، تاریخ و زمان، پاسخ ها، تعداد بازدید.)',
 	'ACP_FEED_EXCLUDE_ID'				=> 'جداسازی این انجمن',
-	'ACP_FEED_EXCLUDE_ID_EXPLAIN'		=> 'محتوای این انجمن ها .<strong>در خوراک نمایش داده نخواهند شد</strong> برای قراردادن اطلاعات تمامی انجمن ها،انجمنی را انتخاب نکنید.<br />با نگه داشتن <samp>CTRL</samp> و کلیک بر روی نام های انجمن ها می توانید به سادگی چند مورد را همزمان انتخاب و یا لغو انتخاب کنید.',
+	'ACP_FEED_EXCLUDE_ID_EXPLAIN'		=> 'محتوای این انجمن ها .<strong>در خوراک نمایش داده نخواهند شد</strong> برای قراردادن اطلاعات تمامی انجمن ها،انجمنی را انتخاب نکنید.<br>با نگه داشتن <samp>CTRL</samp> و کلیک بر روی نام های انجمن ها می توانید به سادگی چند مورد را همزمان انتخاب و یا لغو انتخاب کنید.',
 ));
 
 // Visual Confirmation Settings
@@ -355,7 +355,7 @@ $lang = array_merge($lang, array(
 	'ACP_COOKIE_SETTINGS_EXPLAIN'		=> 'این گزینه ها جزئیات نحوه ارسال کوکی ها به مرورگر را تعیین می کنند. در اغلب موارد تنظیمات پیشفرض برای کوکی ها کافی است. اگر خواستار تغییر این تنظیمات باشید باید دقت کافی به عمل آورید زیرا تنظیمات نا درست از ورود کاربران جلوگیری خواهد کرد چنانچه مشکلاتی با ورود کاربران به تالار دارید به این لینک مراجعه کنید  <b><a href="https://www.phpbb.com/support/go/cookie-settings/">phpBB.com Knowledge Base - Fixing incorrect cookie settings</a></b>',
 
 	'COOKIE_DOMAIN'				=> 'دامنه کوکی',
-	'COOKIE_DOMAIN_EXPLAIN'		=> 'در بیشتر مواقع دامنه کوکی تنظیم است. چنانچه مطمئن نیستید آن را خالی بگذارید.<br /><br />اما اگر تالار شما با برنامه دیگری هماهنگ شده و یا از دامنه های بیشتری استفاده میکنید, آنگاه طبق دستور زیر تنظیمات کوکی را انجام دهید.ج. اگر چیزی شبیه این دارید <i>example.com</i> و <i>forums.example.com</i>,یا شاید <i>forums.example.com</i> و <i>blog.example.com</i>. زیردامنه ها را حذف کنید تا دامنه اصلی مشخص شود, <i>example.com</i>. حالا یک نقطه به جلو دامنه اضافه  کنید مانند .example.com توجه: نقطه در ابتدا است در این مثال).',
+	'COOKIE_DOMAIN_EXPLAIN'		=> 'در بیشتر مواقع دامنه کوکی تنظیم است. چنانچه مطمئن نیستید آن را خالی بگذارید.<br><br>اما اگر تالار شما با برنامه دیگری هماهنگ شده و یا از دامنه های بیشتری استفاده میکنید, آنگاه طبق دستور زیر تنظیمات کوکی را انجام دهید.ج. اگر چیزی شبیه این دارید <i>example.com</i> و <i>forums.example.com</i>,یا شاید <i>forums.example.com</i> و <i>blog.example.com</i>. زیردامنه ها را حذف کنید تا دامنه اصلی مشخص شود, <i>example.com</i>. حالا یک نقطه به جلو دامنه اضافه  کنید مانند .example.com توجه: نقطه در ابتدا است در این مثال).',
 	'COOKIE_NAME'				=> 'نام کوکی',
 	'COOKIE_NAME_EXPLAIN'		=> 'شما میتوانید هر چیزی را به عنوان اصلی انتخاب کنید. هنگامیکه تنظیمات کوکی تغییر کند نام کوکی نیز باید تغییر کند. ',
 	'COOKIE_NOTICE'				=> 'اطلاعیه کوکی',
@@ -375,7 +375,7 @@ $lang = array_merge($lang, array(
 	'ACP_CONTACT_SETTINGS_EXPLAIN'		=> 'در این قسمت شما میتوانید صفحه تماس با ما را فعال یا غیر فعال کنید که همراه با متنی برای آن خواهد بود.',
 
 	'CONTACT_US_ENABLE'				=> 'فعال سازی تماس با ما',
-	'CONTACT_US_ENABLE_EXPLAIN'		=> 'در این صفحه کاربران میتوانند با مدیریت کل سایت از طریق ایمیل ارتباط برقرار کنند.',
+	'CONTACT_US_ENABLE_EXPLAIN'		=> 'در این صفحه کاربران میتوانند با مدیریت کل سایت از طریق ایمیل ارتباط برقرار کنند لطفا توجه داشته باشید که باید تنظیمات ایمیل فعال باشد. تنظیمات مربوطه در بخش اصلی و تنظیمات ایمیل وجود دارد.',
 
 	'CONTACT_US_INFO'				=> 'اطلاعات تماس',
 	'CONTACT_US_INFO_EXPLAIN'		=> 'این متن در صفحه تماس با ما نمایش داده خواهد شد.',
@@ -434,7 +434,7 @@ $lang = array_merge($lang, array(
 	'AUTH_METHOD'				=> 'روش تایید را انتخاب کنید',
 
 	'AUTH_PROVIDER_OAUTH_ERROR_ELEMENT_MISSING'	=> 'Both the key and secret of each enabled OAuth service provider must be provided. Only one was provided for an OAuth service provider.',
-	'AUTH_PROVIDER_OAUTH_EXPLAIN'				=> 'Each OAuth provider requires a unique secret and key in order to authenticate with the external server. These should be supplied by the OAuth service when you register your website with them and should be entered exactly as provided to you.<br />Any service that does not have both a key and a secret entered here will not be available for use by the forum users. Also note, that user can still register and login using the DB authentication plug-in.',
+	'AUTH_PROVIDER_OAUTH_EXPLAIN'				=> 'Each OAuth provider requires a unique secret and key in order to authenticate with the external server. These should be supplied by the OAuth service when you register your website with them and should be entered exactly as provided to you.<br>Any service that does not have both a key and a secret entered here will not be available for use by the forum users. Also note, that user can still register and login using the DB authentication plug-in.',
 	'AUTH_PROVIDER_OAUTH_KEY'					=> 'کلید',
 	'AUTH_PROVIDER_OAUTH_TITLE'					=> 'OAuth',
 	'AUTH_PROVIDER_OAUTH_SECRET'				=> 'رمز',
@@ -450,7 +450,7 @@ $lang = array_merge($lang, array(
 	'LDAP_NO_EMAIL'					=> 'ویژگی ایمیل وارد شده موجود نیست.',
 	'LDAP_NO_IDENTITY'				=> 'هویت ورود برای %s یافت نشد.',
 	'LDAP_PASSWORD'					=> 'کلمه عبور LDAP',
-	'LDAP_PASSWORD_EXPLAIN'			=> 'برای اتصال بی نام این فیلد را خالی بگذارید. در غیر این صورت برای نام کاربری ذکر شده در بالا کلمه عبوری تعریف کنید. تا سرور های دایرکتوری فعال شود.<br /><em><strong>هشدار :</strong> این کلمه عبور در قالبی متن ساده در پایگاه داده ذخیره خواهد شد. و برای همین برای هرکسی که به پایگاه داده دسترسی پیدا کند و یا به این صفحه مراجعه کند،قابل بازدید خواهد بود.</em>',
+	'LDAP_PASSWORD_EXPLAIN'			=> 'برای اتصال بی نام این فیلد را خالی بگذارید. در غیر این صورت برای نام کاربری ذکر شده در بالا کلمه عبوری تعریف کنید. تا سرور های دایرکتوری فعال شود.<br><em><strong>هشدار :</strong> این کلمه عبور در قالبی متن ساده در پایگاه داده ذخیره خواهد شد. و برای همین برای هرکسی که به پایگاه داده دسترسی پیدا کند و یا به این صفحه مراجعه کند،قابل بازدید خواهد بود.</em>',
 	'LDAP_PORT'						=> 'پورت سرور LDAP',
 	'LDAP_PORT_EXPLAIN'				=> 'می توانید پورتی را برای اتصال به سرور LDAP انتخاب کنید، این پورت به جای پورت پیشفرض 389 استفاده خواهد شد.',
 	'LDAP_SERVER'					=> 'نام سرور LDAP',
@@ -531,7 +531,7 @@ $lang = array_merge($lang, array(
 	'IP_LOGIN_LIMIT_TIME'			=> 'تاریخ انقضای اقدام به ورود برای هر IP',
 	'IP_LOGIN_LIMIT_TIME_EXPLAIN'	=> 'بعد از این بازه زمانی ورود امکان پذیر نخواهد بود.',
 	'IP_LOGIN_LIMIT_USE_FORWARDED'	=> 'اعمال محدودیت در ورود توسط هدر <var>X_FORWARDED_FOR</var>',
-	'IP_LOGIN_LIMIT_USE_FORWARDED_EXPLAIN'	=> 'به جای اینکه توسط IP محدودیت هایی در ورود کاربران به وجود آید، داده هدر <var>X_FORWARDED_FOR</var> این محدودیت ها را اعمال می کند. <br /><em><strong>هشدار :</strong> این گزینه را فقط هنگامی فعال کنید که سرور پروکسی شما به طور مطمئن داده <var>X_FORWARDED_FOR</var> رر اجرا می کند.</em>',
+	'IP_LOGIN_LIMIT_USE_FORWARDED_EXPLAIN'	=> 'به جای اینکه توسط IP محدودیت هایی در ورود کاربران به وجود آید، داده هدر <var>X_FORWARDED_FOR</var> این محدودیت ها را اعمال می کند. <br><em><strong>هشدار :</strong> این گزینه را فقط هنگامی فعال کنید که سرور پروکسی شما به طور مطمئن داده <var>X_FORWARDED_FOR</var> رر اجرا می کند.</em>',
 	'MAX_LOGIN_ATTEMPTS'			=> 'حداکثر تعداد اقدام به ورود',
 	'MAX_LOGIN_ATTEMPTS_EXPLAIN'	=> 'بعد از این تعداد ورود ناموفق،از کاربر خواسته خواهد شد تا کد تایید را وارد کند.',
 	'NO_IP_VALIDATION'				=> 'هیچکدام',
@@ -567,8 +567,8 @@ $lang = array_merge($lang, array(
 	'CONTACT_EMAIL_EXPLAIN'			=> 'این آدرس ایمیل هنگامی استفاده خواهد شد که پشتیبانی ای از طریق ایمیل مورد نیاز باشد. برای مثال اسپم،خطا ها و غیره... . همیشه در ایمیل ها به عنوان <samp>از</samp> و <samp>پاسخ به</samp> استفاده خواهد شد.',
 	'CONTACT_EMAIL_NAME'			=> 'نام تماس',
 	'CONTACT_EMAIL_NAME_EXPLAIN'	=> 'نامی که گیرنده های تماس آن را مشاهده خواهند کرد. چنانچه مایل به گذاشتن نامی نیستید این گزینه را خالی بگذارید.',
-	'EMAIL_FUNCTION_NAME'			=> 'نام تابع ایمیل',
-	'EMAIL_FUNCTION_NAME_EXPLAIN'	=> 'ار این تابع برای ارسال ایمیل ها به وسیله PHP استفاده خواهد شد.',
+	'EMAIL_FORCE_SENDER'			=> 'اجبار برای ایمیل آدرس',
+	'EMAIL_FORCE_SENDER_EXPLAIN'	=> 'این تنظیمات به <samp>مسیر بازگشت ایمیل</samp> به جای استفاده از سرور داخلی کاربر ایمیل داده میشود. این تنظیمات وقتی SMTP فعال باشد عمل نخواهد کرد.<br><em><strong>هشدار:</strong> نیازمند تنظیمات ارسال ایمیل کاربری و اعتماد سازی کاربری ادر بخش وب سرور است</em>',
 	'EMAIL_PACKAGE_SIZE'			=> 'حجم بسته ایمیل',
 	'EMAIL_PACKAGE_SIZE_EXPLAIN'	=> 'این حداکثر تعداد ایمیلی می باشد که می توان در یک بسته ارسال کرد این تنظیمات در پیغام های داخلی اعمال می شود. اگر با مشکلی در ارسال ایمیل ها روبرو شدید این گزینه را با وارد کردن 0 غیرفعال کنید.',
 	'EMAIL_SIG'						=> 'امضای ایمیل',
@@ -578,14 +578,14 @@ $lang = array_merge($lang, array(
 	'SEND_TEST_EMAIL'				=> 'ارسال ایمیل آزمایشی',
 	'SEND_TEST_EMAIL_EXPLAIN'		=> 'این قسمت باعث ارسال یک ایمیل آزمایشی به آدرس پیشفرض حساب شما میشود.',
 	'SMTP_ALLOW_SELF_SIGNED'		=> 'مجوز خود-امضا تاییدیه SSL',
-	'SMTP_ALLOW_SELF_SIGNED_EXPLAIN'=> 'مجوز اتصال به سرور SMTP با خود-امضای تاییدیه SSL <em><strong>هشدار:</strong> مجوز خود-امضای تاییدیه SSL ممکن است باعث بوجود آمدن مسائل امنیتی شود.</em>',
+	'SMTP_ALLOW_SELF_SIGNED_EXPLAIN'=> 'مجوز اتصال به سرور SMTP با خود-امضای تاییدیه SSL <br><em><strong>هشدار:</strong> مجوز خود-امضای تاییدیه SSL ممکن است باعث بوجود آمدن مسائل امنیتی شود.</em>',
 	'SMTP_AUTH_METHOD'				=> 'روش تایید برای SMTP',
 	'SMTP_AUTH_METHOD_EXPLAIN'		=> 'فقط هنگامی استفاده کنید که نام کاربری و کلمه عبور تایید شده باشد، اگر مطمئن نیستید که از کدام گزینه استفاده کنید، با سرویس دهنده خود تماس بگیرید.',
 	'SMTP_CRAM_MD5'					=> 'CRAM-MD5',
 	'SMTP_DIGEST_MD5'				=> 'DIGEST-MD5',
 	'SMTP_LOGIN'					=> 'ورود',
 	'SMTP_PASSWORD'					=> 'کلمه عبور SMTP',
-	'SMTP_PASSWORD_EXPLAIN'			=> 'فقط هنگامی کلمه عبور را وارد کنید که سرویس دهنده ایمیل آن را خواسته باشد.<br /><em><strong>هشدار :</strong> این کلمه عبور به صورت متن ساده در پایگاه داده ذخیره خواهد شد و برای هر کسی که به پایگاه داده و یا به این صفحه پیکربندی دسترسی داشته باشد قابل مشاهده خواهد بود.</em>',
+	'SMTP_PASSWORD_EXPLAIN'			=> 'فقط هنگامی کلمه عبور را وارد کنید که سرویس دهنده ایمیل آن را خواسته باشد.<br><em><strong>هشدار :</strong> این کلمه عبور به صورت متن ساده در پایگاه داده ذخیره خواهد شد و برای هر کسی که به پایگاه داده و یا به این صفحه پیکربندی دسترسی داشته باشد قابل مشاهده خواهد بود.</em>',
 	'SMTP_PLAIN'					=> 'PLAIN',
 	'SMTP_POP_BEFORE_SMTP'			=> 'POP-BEFORE-SMTP',
 	'SMTP_PORT'						=> 'پورت سرور SMTP',
@@ -599,7 +599,7 @@ $lang = array_merge($lang, array(
 	'SMTP_VERIFY_PEER_EXPLAIN'		=> 'نیاز به تایید گواهی SSL توسط سرور SMTP <em><strong>هشدار:</strong> اتصال نظیر با گواهینامه SSL تایید نشده ممکن است مشکلات امنیتی بوجود آورد</em>',
 	'SMTP_VERIFY_PEER_NAME'			=> 'تایید SMTP',
 	'SMTP_VERIFY_PEER_NAME_EXPLAIN'	=> 'نیاز به تایید نام نظیر برای سرور SMYP با استفاده از اتصال SSL / TLS <em><strong>هشدار:</strong> اتصال با تاییده نا معتبر باعث ایجاد مشکلات امنیتی خواهد شد. </em>',
-	'TEST_EMAIL_SENT'				=> 'ایمیل آزمایشی ارسال شد.<br />اگر ایمیل به دست شما نرسید تنظیمات بخش ایمیل را بررسی کنید.<br /><br />اگر نیاز به کمک بیشتری دارید, به بخش پشتیبانی مراجعه کنید <a href="https://www.phpbb.com/community/">بخش پشتیبانی</a>.',
+	'TEST_EMAIL_SENT'				=> 'ایمیل آزمایشی ارسال شد.<br>اگر ایمیل به دست شما نرسید تنظیمات بخش ایمیل را بررسی کنید.<br><br>اگر نیاز به کمک بیشتری دارید, به بخش پشتیبانی مراجعه کنید <a href="https://www.phpbb.com/community/">بخش پشتیبانی</a>.',
 	'USE_SMTP'						=> 'استفاده از سرور SMTP برای ایمیل',
 	'USE_SMTP_EXPLAIN'				=> 'برای ارسال ایمیل ها به وسیله سرور SMTP به جای تابع PHP ایمیل، "بله" را انتخاب کنید.',
 ));
@@ -609,7 +609,7 @@ $lang = array_merge($lang, array(
 	'ACP_JABBER_SETTINGS_EXPLAIN'	=> 'در این بخش می توانید Jabber را برای پیغام رسانی سریع و درج اطلاعیه ها در تالار فعال کنید. Jabber پروتکلی بازمتن می باشد و برای همین برای همه قابل استفاده است. بعضی از Jabber ها دارای درگاه هایی کی باشند که می توانند کاربران را به سایر شبکه ها متصل کنند. تغییر در پروتکل ممکن است موجب عدم انتقال شود. لطفا جزئیات اکانت ثبت نام شده را با دقت وارد کنید - phpBB از این اطلاعات استفاده خواهد کرد.',
 
     'JAB_ALLOW_SELF_SIGNED'			=> 'مجوز خود-امضا گواهینامه SSL',
-	'JAB_ALLOW_SELF_SIGNED_EXPLAIN'	=> 'مجوز اتصال به سرور Jabber با خود-امضا گواهینامه SSL <em><strong>هشدار:</strong>مجوز خود-امضای گواهینامه SSL در برخی موارد باعث مشکلات امنیتی خواهد شد. .</em>',
+	'JAB_ALLOW_SELF_SIGNED_EXPLAIN'	=> 'مجوز اتصال به سرور Jabber با خود-امضا گواهینامه SSL <br><em><strong>هشدار:</strong>مجوز خود-امضای گواهینامه SSL در برخی موارد باعث مشکلات امنیتی خواهد شد. .</em>',
 	'JAB_ENABLE'					=> 'فعال سازی Jabber',
 	'JAB_ENABLE_EXPLAIN'			=> 'فعال سازی استفاده از پیام و اطلاعیه Jabber .',
 	'JAB_GTALK_NOTE'				=> 'لطفا توجه کنید که GTalk ممکن است کار  نکند به دلیل عملکرد<samp>dns_get_record</samp>که ممکن است یافت نشود. اسن عملکرد در PHP4 وجود ندارد و با پلتفرم های ویندوز سازگار نیست.و همچنین با سیستم ها BSD مانند مک او اس نیز سازگار نیست. ',
@@ -627,7 +627,7 @@ $lang = array_merge($lang, array(
 	'JAB_USERNAME'					=> 'نام کاربری Jabber یا JID',
 	'JAB_USERNAME_EXPLAIN'			=> 'یک نام کاربری ثبت نام شده یا یک JID معتبر مشخص کنید. اگر تنها یک نام کاربری مشخص کنید آنگاه JID شما نام کاربری در سرور شما مشخص میشوددر غیر ا ین صورت یک JID معتبر مشخص کنید مثلا  user@jabber.org.',	
 	'JAB_VERIFY_PEER'				=> 'تایید گواهینامه SSL',
-	'JAB_VERIFY_PEER_EXPLAIN'		=> 'نیاز به تایید گواهینامه SSL برای استفده از سرور Jabber <em><strong>هشدار:</strong> اتصال نظیر با تاییدیه نا معتبرممکن اس باعث ایجاد مشکلات امنیتی شود </em>',
+	'JAB_VERIFY_PEER_EXPLAIN'		=> 'نیاز به تایید گواهینامه SSL برای استفده از سرور Jabber <br><em><strong>هشدار:</strong> اتصال نظیر با تاییدیه نا معتبرممکن اس باعث ایجاد مشکلات امنیتی شود </em>',
 	'JAB_VERIFY_PEER_NAME'			=> 'تایید نام نظیر Jabber',
 	'JAB_VERIFY_PEER_NAME_EXPLAIN'	=> 'نیاز به تایید یک سرور Jabber که از ارتباط SSL / TSL استفاده میکند <em><strong>هشدار:</strong>اتصال نظیر نا معتبر باعث ایجاد مشکلات امنیتی خواهد شد </em>',
 ));

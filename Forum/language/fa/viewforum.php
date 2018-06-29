@@ -56,7 +56,8 @@ $lang = array_merge($lang, array(
 	'NEW_POSTS_LOCKED'		=> 'پست هاي جديد (بسته است)',	// Not used anymore
 	'NO_NEW_POSTS_HOT'		=> 'بدون پست جديد (محبوب)',	// Not used anymore
 	'NO_NEW_POSTS_LOCKED'	=> 'بدون پست جديد (بسته شده)',	// Not used anymore
-	'NO_READ_ACCESS'		=> 'شما اجازه خواندن مبحث ها را در اين انجمن نداريد.',
+	'NO_READ_ACCESS'		=> 'شما اجازه خواندن و دیدن مباحث اين انجمن را نداريد.',
+	'NO_FORUMS_IN_CATEGORY'	=> 'این شاخه زیر انجمنی ندارد',
 	'NO_UNREAD_POSTS_HOT'		=> 'بدون پست خوانده نشده [ مشهور]',
 	'NO_UNREAD_POSTS_LOCKED'	=> 'بدون پست خوانده نشده [قفل شده]',
 

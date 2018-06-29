@@ -3,7 +3,7 @@
 *
 * phpBB 3.2.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
-* Version: 3.2.1 
+* Version: 3.2.2 
 *
 * @copyright (c) phpBB Limited <https://www.phpbb.com>
 * @license GNU General Public License, version 2 (GPL-2.0)
@@ -50,7 +50,7 @@ $lang = array_merge($lang, array(
 	'USER_LANG'			=> 'fa',
 
 	// You can define different rules for the determination of plural forms here.
-	// See http://wiki.phpbb.com/Plural_Rules for more information
+	// See https://area51.phpbb.com/docs/dev/32x/language/plurals.html for more information
 	// or ask the translation manager for help.
 	'PLURAL_RULE'		=> 1,
 
@@ -562,6 +562,7 @@ $lang = array_merge($lang, array(
 	),
 	'OPTIONS'					=> 'گزینه',
 
+	'PAGE_NOT_FOUND'		=> 'صفحه مورد نظر یافت نشد.',
 	'PAGE_OF'				=> 'صفحه <strong>%1$d</strong> از <strong>%2$d</strong>',
 	'PAGE_TITLE_NUMBER'		=> 'صفحه %s',
 	'PASSWORD'				=> 'کلمه عبور',
