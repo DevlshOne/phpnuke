@@ -29,7 +29,7 @@ $tabbed-navigation:						false !default;	// true or false. Toggles tabbed naviga
 //
 
 $font-size:								11px !default;	// Base font size
-$font-family:							Byekan, Verdana, Helvetica, Arial, sans-serif !default;	// Default font
+$font-family:							Verdana, Helvetica, Arial, sans-serif !default;	// Default font
 $line-height:							1.4 !default;	// Line height
 
 $h1-font-size:							$font-size + 10px !default;
@@ -83,7 +83,7 @@ $post-content-font-family:				"Lucida Grande", "Trebuchet MS", Verdana, Helvetic
 
 $post-title-font-size:					$font-size + 5px !default;
 $post-title-line-height:				1.25 !default;
-$post-title-font-family:				Byekan, $h2-font-family !default;
+$post-title-font-family:				$h2-font-family !default;
 
 $post-signature-font-size:				$font-size + 1px !default;
 $post-quote-font-size:					$post-content-font-size - 1px !default;

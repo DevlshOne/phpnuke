@@ -17,22 +17,15 @@
 	float: right;
 }
 
-
 .rtl div.rules ul {
 	margin-left: 0;
 	margin-right: 20px;
-}
-
-.rtl .jumpbox .dropdown-contents a {
-	margin-right: 0;
-	margin-left: 20px;
 }
 
 /* Main blocks
 ---------------------------------------- */
 .rtl .icon {
 	padding-right: 0;
-	padding-left: 2px;
 }
 
 .rtl .logo {
@@ -74,7 +67,7 @@
 
 .rtl ul.rightside {
 	float: left;
-	margin-left: -5px;
+	margin-left: 0;
 	margin-right: 5px;
 	text-align: left;
 }
@@ -116,6 +109,11 @@
 
 .rtl .dropdown-extended .header .header_settings, .rtl .dropdown-container-right {
 	float: left;
+}
+
+.rtl .jumpbox .dropdown-contents a {
+	margin-right: 0;
+	margin-left: 20px;
 }
 
 /* Notifications
@@ -230,6 +228,10 @@
 
 /* Pagination
 ---------------------------------------- */
+.rtl .page-number {
+	float: left;
+}
+
 .rtl .pagination {
 	text-align: left;
 	float: left;
@@ -259,7 +261,6 @@
 	margin-left: 5px;
 	margin-right: 0;
 }
-
 
 /* Action Bar styles
 ---------------------------------------- */
@@ -318,7 +319,6 @@ li.breadcrumbs span:first-child > a {
 
 .rtl .back2top .top {
 	float: left;
-	margin-left: -10px;
 }
 
 .rtl a.top:after, .rtl a.top2:after {
@@ -343,9 +343,6 @@ li.breadcrumbs span:first-child > a {
 	float: right;
 	margin-right: 0;
 	margin-left: -440px;
-}
-.rtl .forabg li.header dt {
-	margin: 0;
 }
 
 .rtl ul.topiclist.missing-column dt {
@@ -385,8 +382,6 @@ li.breadcrumbs span:first-child > a {
 
 .rtl ul.topiclist dd {
 	float: right;
-	border-right-width: 1px;
-	border-right-style: solid;
 	border-left: none;
 }
 
@@ -450,6 +445,10 @@ li.breadcrumbs span:first-child > a {
 
 /* Post body styles
 ----------------------------------------*/
+.rtl .date {
+	float: left;
+}
+
 .rtl .postbody h3 {
 	float: right;
 }
@@ -461,6 +460,7 @@ li.breadcrumbs span:first-child > a {
 
 .rtl p.post-notice {
 	padding-left: 5px;
+	padding-right: 26px;
 }
 
 .rtl p.post-notice:before {
@@ -882,7 +882,8 @@ li.breadcrumbs span:first-child > a {
 	float: right;
 }
 
-.button-search-end {
+.rtl .button-search-end {
+	border-radius: 4px 0 0 4px;
 	border-left-width: 1px;
 	border-right-width: 0;
 }
@@ -1042,5 +1043,11 @@ li.breadcrumbs span:first-child > a {
 
 	.captcha-panel dd.captcha {
 		margin-right: 0;
+	}
+	
+	.rtl p.responsive-center {
+		float: none;
+		text-align: center;
+		margin-bottom: 5px;
 	}
 }

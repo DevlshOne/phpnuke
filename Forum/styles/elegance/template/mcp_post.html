@@ -293,6 +293,7 @@
 			<!-- END userrow -->
 			</tbody>
 			</table>
+
 			<div class="pagination">
 				<!-- INCLUDE pagination.html -->
 			</div>
@@ -332,7 +333,7 @@
 					<!-- IF pagination_ips.S_IS_PREV -->
 					<li class="arrow previous"><a class="button button-icon-only" href="{pagination_ips.PAGE_URL}" rel="prev" role="button"><i class="icon fa-chevron-{S_CONTENT_FLOW_BEGIN} fa-fw" aria-hidden="true"></i><span class="sr-only">{L_PREVIOUS}</span></a></li>
 					<!-- ELSEIF pagination_ips.S_IS_CURRENT -->
-			     	<li class="active"><span>{pagination_ips.PAGE_NUMBER}</span></li>
+					<li class="active"><span>{pagination_ips.PAGE_NUMBER}</span></li>
 					<!-- ELSEIF pagination_ips.S_IS_ELLIPSIS -->
 					<li class="ellipsis" role="separator"><span>{L_ELLIPSIS}</span></li>
 					<!-- ELSEIF pagination_ips.S_IS_NEXT -->
@@ -343,7 +344,6 @@
 				<!-- END pagination_ips -->
 				</ul>
 			</div>
-
 			</div>
 		</div>
 	<!-- ENDIF -->
