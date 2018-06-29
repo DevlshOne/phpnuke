@@ -31,14 +31,14 @@ class Parser extends ParserBase
 		$ignoreLen = 0;
 		if (!isset($this->table))
 		{
-			$this->table = array();
+			$this->table = [];
 			\preg_match('/^ */', $line, $m);
 			$ignoreLen = \strlen($m[0]);
 			$line      = \substr($line, $ignoreLen);
 		}
 		$line = \preg_replace('/^( *)\\|/', '$1 ', $line);
 		$line = \preg_replace('/\\|( *)$/', ' $1', $line);
-		$this->table['rows'][] = array('line' => $line, 'pos' => $this->pos + $ignoreLen);
+		$this->table['rows'][] = ['line' => $line, 'pos' => $this->pos + $ignoreLen];
 	}
 	protected function addTableBody()
 	{
@@ -91,7 +91,7 @@ class Parser extends ParserBase
 	protected function captureTables()
 	{
 		unset($this->table);
-		$this->tables = array();
+		$this->tables = [];
 		$this->pos = 0;
 		foreach (\explode("\n", $this->text) as $line)
 		{
@@ -169,19 +169,19 @@ class Parser extends ParserBase
 	protected function overwriteMarkdown()
 	{
 		if (\strpos($this->text, '`') !== \false)
-			$this->text = \preg_replace_callback('/`[^`]*`/', array($this, 'overwriteInlineCodeCallback'), $this->text);
+			$this->text = \preg_replace_callback('/`[^`]*`/', [$this, 'overwriteInlineCodeCallback'], $this->text);
 		if (\strpos($this->text, '>') !== \false)
-			$this->text = \preg_replace_callback('/^(?:> ?)+/m', array($this, 'overwriteBlockquoteCallback'), $this->text);
+			$this->text = \preg_replace_callback('/^(?:> ?)+/m', [$this, 'overwriteBlockquoteCallback'], $this->text);
 	}
 	protected function parseColumnAlignments($line)
 	{
-		$align = array(
-			0 => '',
-			1 => 'right',
-			2 => 'left',
-			3 => 'center'
-		);
-		$cols = array();
+		$align = [
+			0b00 => '',
+			0b01 => 'right',
+			0b10 => 'left',
+			0b11 => 'center'
+		];
+		$cols = [];
 		\preg_match_all('/(:?)-+(:?)/', $line, $matches, \PREG_SET_ORDER);
 		foreach ($matches as $m)
 		{

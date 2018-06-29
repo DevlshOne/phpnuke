@@ -10,8 +10,7 @@ use DOMDocument;
 use InvalidArgumentException;
 abstract class Renderer
 {
-	public $metaElementsRegexp = '(<[eis]>[^<]*</[eis]>)';
-	protected $params = array();
+	protected $params = [];
 	protected function loadXML($xml)
 	{
 		$this->checkUnsupported($xml);
@@ -25,7 +24,7 @@ abstract class Renderer
 		if (\substr($xml, 0, 3) === '<t>')
 			return $this->renderPlainText($xml);
 		else
-			return $this->renderRichText(\preg_replace($this->metaElementsRegexp, '', $xml));
+			return $this->renderRichText(\preg_replace('(<[eis]>[^<]*</[eis]>)', '', $xml));
 	}
 	protected function renderPlainText($xml)
 	{

@@ -18,8 +18,8 @@ abstract class ConfiguratorBase implements ConfigProvider
 {
 	protected $configurator;
 	protected $quickMatch = \false;
-	protected $regexpLimit = 10000;
-	final public function __construct(Configurator $configurator, array $overrideProps = array())
+	protected $regexpLimit = 50000;
+	final public function __construct(Configurator $configurator, array $overrideProps = [])
 	{
 		$this->configurator = $configurator;
 		foreach ($overrideProps as $k => $v)
@@ -48,11 +48,11 @@ abstract class ConfiguratorBase implements ConfigProvider
 	}
 	final public function getBaseProperties()
 	{
-		$config = array(
+		$config = [
 			'className'   => \preg_replace('/Configurator$/', 'Parser', \get_class($this)),
 			'quickMatch'  => $this->quickMatch,
 			'regexpLimit' => $this->regexpLimit
-		);
+		];
 		$js = $this->getJSParser();
 		if (isset($js))
 			$config['js'] = new Code($js);
@@ -60,7 +60,7 @@ abstract class ConfiguratorBase implements ConfigProvider
 	}
 	public function getJSHints()
 	{
-		return array();
+		return [];
 	}
 	public function getJSParser()
 	{

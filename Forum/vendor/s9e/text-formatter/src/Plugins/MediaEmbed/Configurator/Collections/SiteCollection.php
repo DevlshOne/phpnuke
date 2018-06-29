@@ -13,7 +13,7 @@ class SiteCollection extends ArrayObject implements ConfigProvider
 {
 	public function asConfig()
 	{
-		$map = array();
+		$map = [];
 		foreach ($this as $siteId => $siteConfig)
 		{
 			if (isset($siteConfig['host']))

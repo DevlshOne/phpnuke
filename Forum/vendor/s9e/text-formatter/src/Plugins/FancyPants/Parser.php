@@ -47,11 +47,11 @@ class Parser extends ParserBase
 	{
 		if (\strpos($this->text, '...') === \false && \strpos($this->text, '--') === \false)
 			return;
-		$chrs = array(
+		$chrs = [
 			'--'  => "\xE2\x80\x93",
 			'---' => "\xE2\x80\x94",
 			'...' => "\xE2\x80\xA6"
-		);
+		];
 		$regexp = '/---?|\\.\\.\\./S';
 		\preg_match_all($regexp, $this->text, $matches, \PREG_OFFSET_CAPTURE);
 		foreach ($matches[0] as $m)
@@ -70,7 +70,7 @@ class Parser extends ParserBase
 	{
 		if (\strpos($this->text, '/') === \false)
 			return;
-		$map = array(
+		$map = [
 			'1/4'  => "\xC2\xBC",
 			'1/2'  => "\xC2\xBD",
 			'3/4'  => "\xC2\xBE",
@@ -90,7 +90,7 @@ class Parser extends ParserBase
 			'5/8'  => "\xE2\x85\x9D",
 			'7/8'  => "\xE2\x85\x9E",
 			'0/3'  => "\xE2\x86\x89"
-		);
+		];
 		$regexp = '/\\b(?:0\\/3|1\\/(?:[2-9]|10)|2\\/[35]|3\\/[458]|4\\/5|5\\/[68]|7\\/8)\\b/S';
 		\preg_match_all($regexp, $this->text, $matches, \PREG_OFFSET_CAPTURE);
 		foreach ($matches[0] as $m)
@@ -150,7 +150,7 @@ class Parser extends ParserBase
 	{
 		if (!$this->hasSingleQuote && !$this->hasDoubleQuote && \strpos($this->text, 'x') === \false)
 			return;
-		$map = array(
+		$map = [
 			"'s" => "\xE2\x80\x99",
 			"'"  => "\xE2\x80\xB2",
 			"' " => "\xE2\x80\xB2",
@@ -158,7 +158,7 @@ class Parser extends ParserBase
 			'"'  => "\xE2\x80\xB3",
 			'" ' => "\xE2\x80\xB3",
 			'"x' => "\xE2\x80\xB3"
-		);
+		];
 		$regexp = "/[0-9](?>'s|[\"']? ?x(?= ?[0-9])|[\"'])/S";
 		\preg_match_all($regexp, $this->text, $matches, \PREG_OFFSET_CAPTURE);
 		foreach ($matches[0] as $m)
@@ -174,11 +174,11 @@ class Parser extends ParserBase
 	{
 		if (\strpos($this->text, '(') === \false)
 			return;
-		$chrs = array(
+		$chrs = [
 			'(c)'  => "\xC2\xA9",
 			'(r)'  => "\xC2\xAE",
 			'(tm)' => "\xE2\x84\xA2"
-		);
+		];
 		$regexp = '/\\((?>c|r|tm)\\)/i';
 		\preg_match_all($regexp, $this->text, $matches, \PREG_OFFSET_CAPTURE);
 		foreach ($matches[0] as $m)

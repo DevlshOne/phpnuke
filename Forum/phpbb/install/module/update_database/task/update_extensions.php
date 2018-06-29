@@ -76,19 +76,7 @@ class update_extensions extends task_base
 	 *				they were added
 	 */
 	static public $default_extensions_update = [
-		'3.2.0-RC2' => ['alg/addonforthanksforposts'],
-     	'3.2.0-RC2' => ['arty/scss'],
-     	'3.2.0-RC2' => ['boardtools/quickreply'],
-     	'3.2.0-RC2' => ['gfksx/ListSubforumsInColumns'],
-      	'3.2.0-RC2' => ['gfksx/ThanksForPosts'],
-       	'3.2.0-RC2' => ['kirk/new_topic_button_in_topic'],
-       	'3.2.0-RC2' => ['meis2m/jalali'],
-     	'3.2.0-RC2' => ['paul999/mention'],
-     	'3.2.0-RC2' => ['phpbb/boardannouncements'],
-     	'3.2.0-RC2' => ['rin/editor'],
-     	'3.2.0-RC2' => ['rmcgirr83/activity24hours'],
-       	'3.2.0-RC2' => ['shredder/sitemap'],
-       	'3.2.0-RC2' => ['vinny/shareon'],
+		'3.2.0-RC2' => ['phpbb/viglink']
 	];
 
 	/**
@@ -218,7 +206,7 @@ class update_extensions extends task_base
 
 			$this->install_config->set('update_extensions_index', $i);
 
-			if ($i < sizeof($all_available_extensions))
+			if ($i < count($all_available_extensions))
 			{
 				throw new resource_limit_reached_exception();
 			}

@@ -21,7 +21,7 @@ class MinifierList extends NormalizedList
 			throw new InvalidArgumentException('Invalid minifier ' . \var_export($minifier, \true));
 		return $minifier;
 	}
-	protected function getMinifierInstance($name, array $args = array())
+	protected function getMinifierInstance($name, array $args = [])
 	{
 		$className = 's9e\\TextFormatter\\Configurator\\JavaScript\\Minifiers\\' . $name;
 		if (!\class_exists($className))

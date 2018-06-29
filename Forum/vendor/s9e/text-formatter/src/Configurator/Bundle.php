@@ -19,6 +19,6 @@ abstract class Bundle
 	}
 	public static function getOptions()
 	{
-		return array();
+		return [];
 	}
 }

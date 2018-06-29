@@ -16,7 +16,7 @@ class HintGenerator
 	protected $xsl;
 	public function getHints()
 	{
-		$this->hints = array();
+		$this->hints = [];
 		$this->setPluginsHints();
 		$this->setRenderingHints();
 		$this->setRulesHints();
@@ -47,6 +47,7 @@ class HintGenerator
 	protected function setRenderingHints()
 	{
 		$this->hints['postProcessing'] = (int) (\strpos($this->xsl, 'data-s9e-livepreview-postprocess') !== \false);
+		$this->hints['ignoreAttrs']    = (int) (\strpos($this->xsl, 'data-s9e-livepreview-ignore-attrs') !== \false);
 	}
 	protected function setRulesHints()
 	{

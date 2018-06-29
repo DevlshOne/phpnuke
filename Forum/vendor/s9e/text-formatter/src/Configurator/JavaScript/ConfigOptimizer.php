@@ -30,12 +30,12 @@ class ConfigOptimizer
 	}
 	public function optimize($object)
 	{
-		return \current($this->optimizeObjectContent(array($object)))->getValue();
+		return \current($this->optimizeObjectContent([$object]))->getValue();
 	}
 	public function reset()
 	{
-		$this->configValues = array();
-		$this->jsLengths    = array();
+		$this->configValues = [];
+		$this->jsLengths    = [];
 	}
 	protected function canDeduplicate($value)
 	{

@@ -13,7 +13,7 @@ use s9e\TextFormatter\Plugins\MediaEmbed\Configurator\TemplateGenerators\Flash;
 use s9e\TextFormatter\Plugins\MediaEmbed\Configurator\TemplateGenerators\Iframe;
 class TemplateBuilder
 {
-	protected $templateGenerators = array();
+	protected $templateGenerators = [];
 	public function __construct()
 	{
 		$this->templateGenerators['choose'] = new Choose($this);

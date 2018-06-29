@@ -17,7 +17,7 @@ class ManageParagraphs implements BooleanRulesGenerator
 	}
 	public function generateBooleanRules(TemplateInspector $src)
 	{
-		$rules = array();
+		$rules = [];
 		if ($src->allowsChild($this->p) && $src->isBlock() && !$this->p->closesParent($src))
 			$rules['createParagraphs'] = \true;
 		if ($src->closesParent($this->p))

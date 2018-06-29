@@ -10,7 +10,7 @@ use s9e\TextFormatter\Utils\Http\Client;
 class Curl extends Client
 {
 	protected static $handle;
-	public function get($url, $headers = array())
+	public function get($url, $headers = [])
 	{
 		$handle = $this->getHandle();
 		\curl_setopt($handle, \CURLOPT_HTTPGET,    \true);
@@ -18,7 +18,7 @@ class Curl extends Client
 		\curl_setopt($handle, \CURLOPT_URL,        $url);
 		return \curl_exec($handle);
 	}
-	public function post($url, $headers = array(), $body = '')
+	public function post($url, $headers = [], $body = '')
 	{
 		$headers[] = 'Content-Length: ' . \strlen($body);
 		$handle = $this->getHandle();

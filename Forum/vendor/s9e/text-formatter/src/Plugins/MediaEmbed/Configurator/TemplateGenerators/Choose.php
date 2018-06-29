@@ -21,7 +21,7 @@ class Choose extends TemplateGenerator
 	}
 	protected function getContentTemplate()
 	{
-		$branches = (isset($this->attributes['when'][0])) ? $this->attributes['when'] : array($this->attributes['when']);
+		$branches = (isset($this->attributes['when'][0])) ? $this->attributes['when'] : [$this->attributes['when']];
 		$template = '<xsl:choose>';
 		foreach ($branches as $when)
 			$template .= '<xsl:when test="' . \htmlspecialchars($when['test'], \ENT_COMPAT, 'UTF-8') . '">' . $this->templateBuilder->getTemplate($when) . '</xsl:when>';

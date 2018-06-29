@@ -13,7 +13,7 @@ class Parser extends ParserBase
 	{
 		$tagName      = $this->config['tagName'];
 		$attrName     = $this->config['attrName'];
-		$replacements = (isset($this->config['replacements'])) ? $this->config['replacements'] : array();
+		$replacements = (isset($this->config['replacements'])) ? $this->config['replacements'] : [];
 		foreach ($matches as $m)
 		{
 			if ($this->isAllowed($m[0][0]))

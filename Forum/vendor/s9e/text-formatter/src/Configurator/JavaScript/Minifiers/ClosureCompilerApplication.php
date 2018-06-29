@@ -25,12 +25,12 @@ class ClosureCompilerApplication extends Minifier
 	}
 	public function getCacheDifferentiator()
 	{
-		$key = array(
+		$key = [
 			$this->compilationLevel,
 			$this->excludeDefaultExterns,
 			$this->options,
 			$this->getClosureCompilerBinHash()
-		);
+		];
 		if ($this->excludeDefaultExterns)
 			$key[] = \file_get_contents(__DIR__ . '/../externs.application.js');
 		return $key;
@@ -51,7 +51,7 @@ class ClosureCompilerApplication extends Minifier
 		     . $options
 		     . ' --js ' . \escapeshellarg($inFile)
 		     . ' --js_output_file ' . \escapeshellarg($outFile);
-		\exec($cmd . ' 2>/dev/null', $output, $return);
+		\exec($cmd . ' 2>&1', $output, $return);
 		\unlink($inFile);
 		if (\file_exists($outFile))
 		{
@@ -59,12 +59,12 @@ class ClosureCompilerApplication extends Minifier
 			\unlink($outFile);
 		}
 		if (!empty($return))
-			throw new RuntimeException('An error occured during minification');
+			throw new RuntimeException('An error occured during minification: ' . \implode("\n", $output));
 		return $src;
 	}
 	protected function getClosureCompilerBinHash()
 	{
-		static $cache = array();
+		static $cache = [];
 		if (!isset($cache[$this->closureCompilerBin]))
 			$cache[$this->closureCompilerBin] = \md5_file($this->closureCompilerBin);
 		return $cache[$this->closureCompilerBin];

@@ -13,7 +13,7 @@ class Helper
 	public $defaultReplacement = '****';
 	public $regexp = '/(?!)/';
 	public $regexpHtml = '/(?!)/';
-	public $replacements = array();
+	public $replacements = [];
 	public $tagName = 'CENSOR';
 	public function __construct(array $config)
 	{
@@ -22,7 +22,6 @@ class Helper
 	}
 	public function censorHtml($html, $censorAttributes = \false)
 	{
-		$_this = $this;
 		$attributesExpr = '';
 		if ($censorAttributes)
 			$attributesExpr = '|[^<">]*+(?=<|$|"(?> [-\\w]+="[^"]*+")*+\\/?>)';
@@ -35,21 +34,20 @@ class Helper
 		        . \substr($this->regexpHtml, $pos);
 		return \preg_replace_callback(
 			$regexp,
-			function ($m) use ($_this)
+			function ($m)
 			{
-				return \htmlspecialchars($_this->getReplacement(\html_entity_decode($m[0], \ENT_QUOTES, 'UTF-8')), \ENT_QUOTES);
+				return \htmlspecialchars($this->getReplacement(\html_entity_decode($m[0], \ENT_QUOTES, 'UTF-8')), \ENT_QUOTES);
 			},
 			$html
 		);
 	}
 	public function censorText($text)
 	{
-		$_this = $this;
 		return \preg_replace_callback(
 			$this->regexp,
-			function ($m) use ($_this)
+			function ($m)
 			{
-				return $_this->getReplacement($m[0]);
+				return $this->getReplacement($m[0]);
 			},
 			$text
 		);
@@ -58,15 +56,7 @@ class Helper
 	{
 		return (\preg_match($this->regexp, $word) && !$this->isAllowed($word));
 	}
-	public function buildTag($word)
-	{
-		$startTag = '<' . $this->tagName;
-		$replacement = $this->getReplacement($word);
-		if ($replacement !== $this->defaultReplacement)
-			$startTag .= ' ' . $this->attrName . '="' . \htmlspecialchars($replacement, \ENT_COMPAT) . '"';
-		return $startTag . '>' . $word . '</' . $this->tagName . '>';
-	}
-	public function getReplacement($word)
+	protected function getReplacement($word)
 	{
 		if ($this->isAllowed($word))
 			return $word;
@@ -78,7 +68,7 @@ class Helper
 		}
 		return $this->defaultReplacement;
 	}
-	public function isAllowed($word)
+	protected function isAllowed($word)
 	{
 		return (isset($this->allowed) && \preg_match($this->allowed, $word));
 	}

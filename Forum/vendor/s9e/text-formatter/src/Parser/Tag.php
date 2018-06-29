@@ -11,8 +11,8 @@ class Tag
 	const START_TAG = 1;
 	const END_TAG = 2;
 	const SELF_CLOSING_TAG = 3;
-	protected $attributes = array();
-	protected $cascade = array();
+	protected $attributes = [];
+	protected $cascade = [];
 	protected $endTag = \null;
 	protected $flags = 0;
 	protected $invalid = \false;

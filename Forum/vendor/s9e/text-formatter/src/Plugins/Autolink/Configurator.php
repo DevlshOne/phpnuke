@@ -24,11 +24,11 @@ class Configurator extends ConfiguratorBase
 	}
 	public function asConfig()
 	{
-		$config = array(
+		$config = [
 			'attrName'   => $this->attrName,
 			'regexp'     => $this->getRegexp(),
 			'tagName'    => $this->tagName
-		);
+		];
 		if (!$this->matchWww)
 			$config['quickMatch'] = '://';
 		return $config;

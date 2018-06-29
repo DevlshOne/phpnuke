@@ -24,8 +24,8 @@ class XSLT implements RendererGenerator
 	}
 	public function getXSL(Rendering $rendering)
 	{
-		$groupedTemplates = array();
-		$prefixes         = array();
+		$groupedTemplates = [];
+		$prefixes         = [];
 		$templates        = $rendering->getTemplates();
 		TemplateHelper::replaceHomogeneousTemplates($templates, 3);
 		foreach ($templates as $tagName => $template)

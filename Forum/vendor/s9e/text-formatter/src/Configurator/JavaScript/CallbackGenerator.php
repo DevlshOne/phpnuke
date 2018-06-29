@@ -8,19 +8,19 @@
 namespace s9e\TextFormatter\Configurator\JavaScript;
 class CallbackGenerator
 {
-	public $callbacks = array(
-		'tags.*.attributes.*.filterChain.*' => array(
+	public $callbacks = [
+		'tags.*.attributes.*.filterChain.*' => [
 			'attrValue' => '*',
 			'attrName'  => '!string'
-		),
-		'tags.*.attributes.*.generator' => array(
+		],
+		'tags.*.attributes.*.generator' => [
 			'attrName'  => '!string'
-		),
-		'tags.*.filterChain.*' => array(
+		],
+		'tags.*.filterChain.*' => [
 			'tag'       => '!Tag',
 			'tagConfig' => '!Object'
-		)
-	);
+		]
+	];
 	protected $encoder;
 	public function __construct()
 	{
@@ -35,8 +35,8 @@ class CallbackGenerator
 	protected function buildCallbackArguments(array $params, array $localVars)
 	{
 		unset($params['parser']);
-		$localVars += array('logger' => 1, 'openTags' => 1, 'registeredVars' => 1, 'text' => 1);
-		$args = array();
+		$localVars += ['logger' => 1, 'openTags' => 1, 'registeredVars' => 1, 'text' => 1];
+		$args = [];
 		foreach ($params as $k => $v)
 			if (isset($v))
 				$args[] = $this->encoder->encode($v);
@@ -50,7 +50,7 @@ class CallbackGenerator
 	{
 		if ($config['js'] == 'returnFalse' || $config['js'] == 'returnTrue')
 			return new Code((string) $config['js']);
-		$config += array('params' => array());
+		$config += ['params' => []];
 		$src  = $this->getHeader($params);
 		$src .= 'function(' . \implode(',', \array_keys($params)) . '){';
 		$src .= 'return ' . $this->parenthesizeCallback($config['js']);
@@ -68,7 +68,7 @@ class CallbackGenerator
 	protected function mapArray(array $array, array $path, array $params)
 	{
 		$key  = \array_shift($path);
-		$keys = ($key === '*') ? \array_keys($array) : array($key);
+		$keys = ($key === '*') ? \array_keys($array) : [$key];
 		foreach ($keys as $key)
 		{
 			if (!isset($array[$key]))

@@ -15,7 +15,7 @@ class Parser extends ParserBase
 		$tagName  = $this->config['tagName'];
 		$attrName = $this->config['attrName'];
 		$onlyFirst = !empty($this->config['onlyFirst']);
-		$keywords  = array();
+		$keywords  = [];
 		foreach ($regexps as $regexp)
 		{
 			\preg_match_all($regexp, $text, $matches, \PREG_OFFSET_CAPTURE);

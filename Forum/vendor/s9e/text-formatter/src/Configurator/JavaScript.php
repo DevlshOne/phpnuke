@@ -27,7 +27,7 @@ class JavaScript
 	protected $configOptimizer;
 	protected $configurator;
 	public $encoder;
-	public $exportMethods = array(
+	public $exportMethods = [
 		'disablePlugin',
 		'disableTag',
 		'enablePlugin',
@@ -38,7 +38,7 @@ class JavaScript
 		'setNestingLimit',
 		'setParameter',
 		'setTagLimit'
-	);
+	];
 	protected $hintGenerator;
 	protected $minifier;
 	protected $stylesheetCompressor;
@@ -61,8 +61,9 @@ class JavaScript
 	public function getParser(array $config = \null)
 	{
 		$this->configOptimizer->reset();
-		$rendererGenerator = new XSLT;
-		$this->xsl = $rendererGenerator->getXSL($this->configurator->rendering);
+		$xslt      = new XSLT;
+		$xslt->optimizer->normalizer->remove('RemoveLivePreviewAttributes');
+		$this->xsl = $xslt->getXSL($this->configurator->rendering);
 		$this->config = (isset($config)) ? $config : $this->configurator->asConfig();
 		$this->config = ConfigHelper::filterConfig($this->config, 'JS');
 		$this->config = $this->callbackGenerator->replaceCallbacks($this->config);
@@ -97,7 +98,7 @@ class JavaScript
 	{
 		if (empty($this->exportMethods))
 			return '';
-		$methods = array();
+		$methods = [];
 		foreach ($this->exportMethods as $method)
 			$methods[] = "'" . $method . "':" . $method;
 		return "window['s9e']['TextFormatter'] = {" . \implode(',', $methods) . '}';
@@ -121,23 +122,23 @@ class JavaScript
 			unset($pluginConfig['className']);
 			if (isset($pluginConfig['quickMatch']))
 			{
-				$valid = array(
+				$valid = [
 					'[[:ascii:]]',
 					'[\\xC0-\\xDF][\\x80-\\xBF]',
 					'[\\xE0-\\xEF][\\x80-\\xBF]{2}',
 					'[\\xF0-\\xF7][\\x80-\\xBF]{3}'
-				);
+				];
 				$regexp = '#(?>' . \implode('|', $valid) . ')+#';
 				if (\preg_match($regexp, $pluginConfig['quickMatch'], $m))
 					$pluginConfig['quickMatch'] = $m[0];
 				else
 					unset($pluginConfig['quickMatch']);
 			}
-			$globalKeys = array(
+			$globalKeys = [
 				'quickMatch'  => 1,
 				'regexp'      => 1,
 				'regexpLimit' => 1
-			);
+			];
 			$globalConfig = \array_intersect_key($pluginConfig, $globalKeys);
 			$localConfig  = \array_diff_key($pluginConfig, $globalKeys);
 			if (isset($globalConfig['regexp']) && !($globalConfig['regexp'] instanceof Code))
@@ -170,24 +171,20 @@ class JavaScript
 	}
 	protected function getSource()
 	{
-		$src = '';
-		$files = array(
-			'Parser/utils.js',
-			'Parser/BuiltInFilters.js',
-			'Parser/' . (\in_array('getLogger', $this->exportMethods) ? '' : 'Null') . 'Logger.js',
-			'Parser/Tag.js',
-			'Parser.js'
-		);
+		$rootDir = __DIR__ . '/..';
+		$src     = '';
+		$logger = (\in_array('getLogger', $this->exportMethods)) ? 'Logger.js' : 'NullLogger.js';
+		$files   = \glob($rootDir . '/Parser/AttributeFilters/*.js');
+		$files[] = $rootDir . '/Parser/utils.js';
+		$files[] = $rootDir . '/Parser/' . $logger;
+		$files[] = $rootDir . '/Parser/Tag.js';
+		$files[] = $rootDir . '/Parser.js';
 		if (\in_array('preview', $this->exportMethods, \true))
 		{
-			$files[] = 'render.js';
+			$files[] = $rootDir . '/render.js';
 			$src .= '/** @const */ var xsl=' . $this->getStylesheet() . ";\n";
 		}
-		foreach ($files as $filename)
-		{
-			$filepath = __DIR__ . '/../' . $filename;
-			$src .= \file_get_contents($filepath) . "\n";
-		}
+		$src .= \implode("\n", \array_map('file_get_contents', $files));
 		return $src;
 	}
 	protected function getStylesheet()
@@ -208,14 +205,14 @@ class JavaScript
 	protected function injectConfig($src)
 	{
 		$config = \array_map(
-			array($this, 'encode'),
+			[$this, 'encode'],
 			$this->configOptimizer->optimize(
-				array(
+				[
 					'plugins'        => $this->getPluginsConfig(),
 					'registeredVars' => $this->getRegisteredVarsConfig(),
 					'rootContext'    => $this->getRootContext(),
 					'tagsConfig'     => $this->getTagsConfig()
-				)
+				]
 			)
 		);
 		$src = \preg_replace_callback(

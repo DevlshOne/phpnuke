@@ -12,7 +12,7 @@ abstract class Utils
 {
 	public static function getAttributeValues($xml, $tagName, $attrName)
 	{
-		$values = array();
+		$values = [];
 		if (\strpos($xml, '<' . $tagName) !== \false)
 		{
 			$regexp = '(<' . \preg_quote($tagName) . '(?= )[^>]*? ' . \preg_quote($attrName) . '="([^"]*+))';
@@ -44,21 +44,21 @@ abstract class Utils
 			return $xml;
 		$dom   = self::loadXML($xml);
 		$xpath = new DOMXPath($dom);
-		$nodes = $xpath->query(\str_repeat('//' . $tagName, 1 + $nestingLevel));
+		$query = '//' . $tagName . '[count(ancestor::' . $tagName . ') >= ' . $nestingLevel . ']';
+		$nodes = $xpath->query($query);
 		foreach ($nodes as $node)
 			$node->parentNode->removeChild($node);
 		return self::saveXML($dom);
 	}
-	public static function replaceAttributes($xml, $tagName, $callback)
+	public static function replaceAttributes($xml, $tagName, callable $callback)
 	{
-		$_self = __CLASS__;
 		if (\strpos($xml, '<' . $tagName) === \false)
 			return $xml;
 		return \preg_replace_callback(
 			'((<' . \preg_quote($tagName) . ')(?=[ />])[^>]*?(/?>))',
-			function ($m) use ($callback, $_self)
+			function ($m) use ($callback)
 			{
-				return $m[1] . $_self::serializeAttributes($callback($_self::parseAttributes($m[0]))) . $m[2];
+				return $m[1] . self::serializeAttributes($callback(self::parseAttributes($m[0]))) . $m[2];
 			},
 			$xml
 		);
@@ -76,9 +76,9 @@ abstract class Utils
 		$dom->loadXML($xml, $flags);
 		return $dom;
 	}
-	public static function parseAttributes($xml)
+	protected static function parseAttributes($xml)
 	{
-		$attributes = array();
+		$attributes = [];
 		if (\strpos($xml, '="') !== \false)
 		{
 			\preg_match_all('(([^ =]++)="([^"]*))S', $xml, $matches);
@@ -91,7 +91,7 @@ abstract class Utils
 	{
 		return self::encodeUnicodeSupplementaryCharacters($dom->saveXML($dom->documentElement));
 	}
-	public static function serializeAttributes(array $attributes)
+	protected static function serializeAttributes(array $attributes)
 	{
 		$xml = '';
 		\ksort($attributes);

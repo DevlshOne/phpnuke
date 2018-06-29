@@ -32,7 +32,7 @@ abstract class Minifier
 	protected function getFromCache($src)
 	{
 		$differentiator = $this->getCacheDifferentiator();
-		$key            = \sha1(\serialize(array(\get_class($this), $differentiator, $src)));
+		$key            = \sha1(\serialize([\get_class($this), $differentiator, $src]));
 		$cacheFile      = $this->cacheDir . '/minifier.' . $key . '.js';
 		if (!\file_exists($cacheFile))
 			\file_put_contents($cacheFile, $this->minify($src));

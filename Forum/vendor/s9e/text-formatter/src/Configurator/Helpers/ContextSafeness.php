@@ -10,14 +10,14 @@ abstract class ContextSafeness
 {
 	public static function getDisallowedCharactersAsURL()
 	{
-		return array(':');
+		return [':'];
 	}
 	public static function getDisallowedCharactersInCSS()
 	{
-		return array('(', ')', ':', '\\', '"', "'", ';', '{', '}');
+		return ['(', ')', ':', '\\', '"', "'", ';', '{', '}'];
 	}
 	public static function getDisallowedCharactersInJS()
 	{
-		return array('(', ')', '"', "'", '\\', "\r", "\n", "\xE2\x80\xA8", "\xE2\x80\xA9", ':', '%', '=');
+		return ['(', ')', '"', "'", '\\', "\r", "\n", "\xE2\x80\xA8", "\xE2\x80\xA9", ':', '%', '='];
 	}
 }

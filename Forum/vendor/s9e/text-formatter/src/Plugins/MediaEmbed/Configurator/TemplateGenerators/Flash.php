@@ -11,12 +11,12 @@ class Flash extends TemplateGenerator
 {
 	protected function getContentTemplate()
 	{
-		$attributes = array(
+		$attributes = [
 			'data'          => $this->attributes['src'],
 			'style'         => $this->attributes['style'],
 			'type'          => 'application/x-shockwave-flash',
 			'typemustmatch' => ''
-		);
+		];
 		$flashVarsParam = '';
 		if (isset($this->attributes['flashvars']))
 			$flashVarsParam = $this->generateParamElement('flashvars', $this->attributes['flashvars']);
@@ -29,6 +29,6 @@ class Flash extends TemplateGenerator
 	}
 	protected function generateParamElement($paramName, $paramValue)
 	{
-		return '<param name="' . \htmlspecialchars($paramName) . '">' . $this->generateAttributes(array('value' => $paramValue)) . '</param>';
+		return '<param name="' . \htmlspecialchars($paramName) . '">' . $this->generateAttributes(['value' => $paramValue]) . '</param>';
 	}
 }

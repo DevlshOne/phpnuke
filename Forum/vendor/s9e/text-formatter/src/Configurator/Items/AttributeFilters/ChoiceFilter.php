@@ -20,7 +20,7 @@ class ChoiceFilter extends RegexpFilter
 	{
 		if (!\is_bool($caseSensitive))
 			throw new InvalidArgumentException('Argument 2 passed to ' . __METHOD__ . ' must be a boolean');
-		$regexp = RegexpBuilder::fromList($values, array('delimiter' => '/'));
+		$regexp = RegexpBuilder::fromList($values, ['delimiter' => '/']);
 		$regexp = '/^' . $regexp . '$/D';
 		if (!$caseSensitive)
 			$regexp .= 'i';

@@ -29,7 +29,7 @@ abstract class Bundle
 			$xml = \call_user_func(static::$afterParse, $xml);
 		return $xml;
 	}
-	public static function render($xml, array $params = array())
+	public static function render($xml, array $params = [])
 	{
 		$renderer = static::getCachedRenderer();
 		if (!empty($params))

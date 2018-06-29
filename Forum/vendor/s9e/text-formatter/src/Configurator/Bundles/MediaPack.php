@@ -15,7 +15,7 @@ class MediaPack extends Bundle
 	{
 		if (!isset($configurator->MediaEmbed))
 		{
-			$pluginOptions = array('createMediaBBCode' => isset($configurator->BBCodes));
+			$pluginOptions = ['createMediaBBCode' => isset($configurator->BBCodes)];
 			$configurator->plugins->load('MediaEmbed', $pluginOptions);
 		}
 		foreach ($configurator->MediaEmbed->defaultSites as $siteId => $siteConfig)

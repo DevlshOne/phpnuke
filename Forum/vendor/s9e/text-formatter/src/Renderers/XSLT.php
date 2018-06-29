@@ -81,12 +81,12 @@ class XSLT extends Renderer
 	}
 	protected function normalizeAttributes($html)
 	{
-		return \preg_replace_callback('(<\\S++ [^>]++>)', array($this, 'normalizeElement'), $html);
+		return \preg_replace_callback('(<\\S++ [^>]++>)', [$this, 'normalizeElement'], $html);
 	}
 	protected function normalizeElement(array $m)
 	{
 		if (\strpos($m[0], "='") === \false)
 			return $m[0];
-		return \preg_replace_callback('((?:"[^"]*"|\'[^\']*\'))S', array($this, 'normalizeAttribute'), $m[0]);
+		return \preg_replace_callback('((?:"[^"]*"|\'[^\']*\'))S', [$this, 'normalizeAttribute'], $m[0]);
 	}
 }

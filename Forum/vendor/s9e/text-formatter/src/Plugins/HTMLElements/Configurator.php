@@ -17,8 +17,8 @@ use s9e\TextFormatter\Configurator\Validators\TagName;
 use s9e\TextFormatter\Plugins\ConfiguratorBase;
 class Configurator extends ConfiguratorBase
 {
-	protected $aliases = array();
-	protected $attributeFilters = array(
+	protected $aliases = [];
+	protected $attributeFilters = [
 		'action'     => '#url',
 		'cite'       => '#url',
 		'data'       => '#url',
@@ -29,11 +29,11 @@ class Configurator extends ConfiguratorBase
 		'manifest'   => '#url',
 		'poster'     => '#url',
 		'src'        => '#url'
-	);
-	protected $elements = array();
+	];
+	protected $elements = [];
 	protected $prefix = 'html';
 	protected $quickMatch = '<';
-	protected $unsafeElements = array(
+	protected $unsafeElements = [
 		'base',
 		'embed',
 		'frame',
@@ -41,11 +41,11 @@ class Configurator extends ConfiguratorBase
 		'meta',
 		'object',
 		'script'
-	);
-	protected $unsafeAttributes = array(
+	];
+	protected $unsafeAttributes = [
 		'style',
 		'target'
-	);
+	];
 	public function aliasAttribute($elName, $attrName, $alias)
 	{
 		$elName   = $this->normalizeElementName($elName);
@@ -146,11 +146,11 @@ class Configurator extends ConfiguratorBase
 		$endTagRegexp   = '/(' . $tagRegexp . ')';
 		$startTagRegexp = '(' . $tagRegexp . ')((?>\\s+' . $attrRegexp . ')*+)\\s*/?';
 		$regexp = '#<(?>' . $endTagRegexp . '|' . $startTagRegexp . ')\\s*>#i';
-		$config = array(
+		$config = [
 			'quickMatch' => $this->quickMatch,
 			'prefix'     => $this->prefix,
 			'regexp'     => $regexp
-		);
+		];
 		if (!empty($this->aliases))
 		{
 			$config['aliases'] = new Dictionary;
@@ -161,6 +161,6 @@ class Configurator extends ConfiguratorBase
 	}
 	public function getJSHints()
 	{
-		return array('HTMLELEMENTS_HAS_ALIASES' => (int) !empty($this->aliases));
+		return ['HTMLELEMENTS_HAS_ALIASES' => (int) !empty($this->aliases)];
 	}
 }
