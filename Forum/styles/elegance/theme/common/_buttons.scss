@@ -9,7 +9,7 @@ $button-outer-height:	$button-inner-height + $button-border-width * 2;
 	padding: $button-top-padding $button-side-padding;
 	font-size: $button-font-size;
 	font-weight: 600;
-	font-family: "Open Sans", "Droid Sans", Verdana, Arial, Helvetica;		
+	font-family: sans, "Open Sans", "Droid Sans", Verdana, Arial, Helvetica;		
 	line-height: $button-line-height;
 	text-align: center;
 	white-space: nowrap;
