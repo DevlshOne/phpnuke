@@ -1783,7 +1783,7 @@ a.forumtitle, a.topictitle {
     text-decoration: underline; }
 
 a.topictitle {
-  font-family: "Droid Sans", "Open Sans", "Trebuchet MS", Helvetica, Arial, sans-serif;
+  font-family: sans, "Droid Sans", "Open Sans", "Trebuchet MS", Helvetica, Arial, sans-serif;
   font-size: 15px; }
 
 a.lastsubject {
