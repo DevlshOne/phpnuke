@@ -4,8 +4,7 @@
 	Edit .scss files instead. See http://www.artodia.com/phpbb-31-tutorials/compile-theme/
 	If you have any questions, please ask on support forum at http://www.artodia.com/forums/
 */
-@font-face { font-family: 'sans'; src: url(./fonts/IRANSans-web.eot); src: url(./fonts/IRANSans-web.eot#iefix) format("embedded-opentype"), url(./fonts/IRANSans-web.woff2) format("woff2"), url(./fonts/IRANSans-web.woff) format("woff"), url(./fonts/IRANSans-web.ttf) format("ttf"); font-weight: 400; }
-@font-face { font-family: 'sans'; src: url(./fonts/IRANSans-Medium-web.eot); src: url(./fonts/IRANSans-Medium-web.eot#iefix) format("embedded-opentype"), url(./fonts/IRANSans-Medium-web.woff2) format("woff2"), url(./fonts/IRANSans-Medium-web.woff) format("woff"), url(./fonts/IRANSans-Medium-web.ttf) format("ttf"); font-weight: 700; }
+@import url("custom.css");
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -1783,7 +1782,7 @@ a.forumtitle, a.topictitle {
     text-decoration: underline; }
 
 a.topictitle {
-  font-family: "Droid Sans", "Open Sans", "Trebuchet MS", Helvetica, Arial, sans-serif;
+  font-family: sans, "Droid Sans", "Open Sans", "Trebuchet MS", Helvetica, Arial, sans-serif;
   font-size: 15px; }
 
 a.lastsubject {
@@ -2348,7 +2347,7 @@ dd.option {
 
 .postbody .content {
   font-size: 13px;
-  line-height: 1.4;
+  line-height: 1.8;
   overflow-x: auto; }
 
 .postbody img.postimage {
@@ -2450,7 +2449,7 @@ p.author {
   font-size: 11px;
   line-height: 1.4;
   clear: both; }
-
+/*
 .signature {
   margin-top: 1.5em;
   padding-top: 0.2em;
@@ -2477,7 +2476,7 @@ dd .signature {
 
 .signature ul, .signature ol {
   margin: 0.8em 0 0.9em 3em; }
-
+*/
 .notice {
   font-family: sans, "Lucida Grande", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
   width: auto;
@@ -6128,3 +6127,4 @@ th {
 
 .affix {
   position: fixed; }
+  
