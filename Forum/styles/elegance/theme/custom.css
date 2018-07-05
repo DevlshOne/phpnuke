@@ -11,5 +11,10 @@
   text-shadow: 1px 1px white; color: gray;
   text-align: right;
   padding: 15px 66px 15px 66px; }
+  
+input {
+  font-family: sans !important;
+}
 
+a.button2 { font-family: sans !important; }
   
