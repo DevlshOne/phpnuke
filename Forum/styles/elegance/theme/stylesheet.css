@@ -2449,7 +2449,7 @@ p.author {
   font-size: 11px;
   line-height: 1.4;
   clear: both; }
-/*
+
 .signature {
   margin-top: 1.5em;
   padding-top: 0.2em;
@@ -2476,7 +2476,7 @@ dd .signature {
 
 .signature ul, .signature ol {
   margin: 0.8em 0 0.9em 3em; }
-*/
+
 .notice {
   font-family: sans, "Lucida Grande", "Trebuchet MS", Verdana, Helvetica, Arial, sans-serif;
   width: auto;
