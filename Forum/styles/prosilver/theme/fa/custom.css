@@ -1,0 +1,11 @@
+@font-face { font-family: 'sans'; src: url(./fonts/IRANSans-web.eot); src: url(./fonts/IRANSans-web.eot#iefix) format("embedded-opentype"), url(./fonts/IRANSans-web.woff2) format("woff2"), url(./fonts/IRANSans-web.woff) format("woff"), url(./fonts/IRANSans-web.ttf) format("ttf"); font-weight: 400; }
+@font-face { font-family: 'sans'; src: url(./fonts/IRANSans-Medium-web.eot); src: url(./fonts/IRANSans-Medium-web.eot#iefix) format("embedded-opentype"), url(./fonts/IRANSans-Medium-web.woff2) format("woff2"), url(./fonts/IRANSans-Medium-web.woff) format("woff"), url(./fonts/IRANSans-Medium-web.ttf) format("ttf"); font-weight: 700; }
+
+input {
+  font-family: sans !important;
+}
+
+a.button2 { 
+font-family: sans !important; 
+}
+  
