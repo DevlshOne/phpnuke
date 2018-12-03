@@ -120,11 +120,11 @@ $lang = array_merge($lang, array(
 	'SEARCH_INDEX_CREATE_REDIRECT'			=> array(
 		2	=> 'همه پست ها تا id %1$d از بین %2$d پست در این مرحله شاخص بندی شدند.رتبه شاخص بندی کنونی تقریبا %3$در ثانیه می باشد.<br />شاخص بندی در حال اجرا است.',
 	),
-	'SEARCH_INDEX_CREATE_REDIRECT_RATE'		=> array(
-		2	=> 'The current rate of indexing is approximately %1$.1f posts per second.<br />Indexing in progress…',
-	),
 	'SEARCH_INDEX_DELETE_REDIRECT'			=> array(
-		2	=> 'همه پست ها تا id %1$d از شاخص جستجو حذف شدند.<br />حذف پست ها از شاخص در حال اجرا است.',
+		2	=> 'تمامی پست های شماره %2$d پاک شدند, که تعداد %1$d پست در مرحله اجراست<br />',
+	),
+	'SEARCH_INDEX_DELETE_REDIRECT_RATE'		=> array(
+		2	=> 'زمان تخمینی حذف پست ها % ثانیه به ازاء هر پست است.<br />فرآیند حذف در حال اجرا',
 	),
 	'SEARCH_INDEX_CREATED'					=> 'با موفقیت تمامی پست ها در پایگاه داده شاخص بندی شدند.',
 	'SEARCH_INDEX_REMOVED'					=> 'با موفقیت شاخص این مرجع جستجو حذف شد.',

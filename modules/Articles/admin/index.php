@@ -256,7 +256,7 @@ if (check_admin_permission($module_name, false, true))
 		
 		$sid = intval($sid);
 		
-		$mode = (!in_array($mode, array("new", "edit", "delete"))) ? "new":$mode;
+		$mode = (!in_array($mode, array("new", "edit", "delete", "publish_now"))) ? "new":$mode;
 		$article_status = "publish";
 		$article_aid = '';
 		
@@ -760,7 +760,7 @@ if (check_admin_permission($module_name, false, true))
 					foreach($categories->result as $cid => $catname)
 					{
 						$sel = ($cid == $article_fields['cat_link']) ? "selected":"";
-						$contents .= "<option value=\"$cid\" $sel>$catname</option>";
+						$contents .= "<option value=\"$cid\" $sel>".str_replace("-"," ", $catname)."</option>";
 					}					
 					$contents .= "</select>
 					</td>					
@@ -773,7 +773,7 @@ if (check_admin_permission($module_name, false, true))
 					foreach($categories->result as $cid => $catname)
 					{
 						$sel = (in_array($cid, $article_fields['cat'])) ? "selected":"";
-						$contents .= "<option value=\"$cid\" $sel>$catname</option>";
+						$contents .= "<option value=\"$cid\" $sel>".str_replace("-"," ", $catname)."</option>";
 					}					
 					$contents .= "</select>
 					</td>					

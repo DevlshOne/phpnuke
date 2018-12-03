@@ -491,7 +491,7 @@ function comments_theme($el, $post_comment, $depth, $main_parent)
 	if (($el->comments_configs['anonymous'] == 1 OR is_admin() OR is_user()) && $depth <= $el->comments_configs['depth'])
 	{
 		$depth++;
-		$options[] = "<a href=\"".$el->Req_URIs_2."#commenteditor\" onclick=\"reply_to('".$post_comment['cid']."','$main_parent');\" title=\""._REPLY."\"><i class=\"glyphicon glyphicon-share-alt\"></i></a> ";
+		$options[] = "<a href=\"".$el->Req_URIs_2."#commenteditor\" onclick=\"reply_to('".$post_comment['cid']."','$main_parent','".$post_comment['username']."','".mb_word_wrap(strip_tags(stripslashes($post_comment['comment'])), 100)."');\" title=\""._REPLY."\"><i class=\"glyphicon glyphicon-share-alt\"></i></a> ";
 	}
 	if ($el->comments_configs['allow_reporting'] == 1)
 	{
@@ -502,6 +502,7 @@ function comments_theme($el, $post_comment, $depth, $main_parent)
 	
 	$contents = "";
 	$contents .= "
+	<div class=\"clear\"></div>
 	<!-- Comment -->
 	<a name=\"comment-".$post_comment['cid']."\"></a>
 	<div class=\"col-sm-12".(($depth > 1) ? " comments-reply":" well")."".((intval($post_comment['reported_id']) > 0) ? " reported":"")."\">

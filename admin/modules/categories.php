@@ -84,7 +84,7 @@ if (check_admin_permission($filename))
 				(SELECT COUNT(c1.catid) FROM ".CATEGORIES_TABLE." AS c1 WHERE c1.parent_id = ? AND c1.module =?) as total_rows, 
 				(SELECT COUNT(c2.catid) FROM ".CATEGORIES_TABLE." AS c2 WHERE c2.module =? AND c2.parent_id = c.catid) as sub_cats
 				FROM ".CATEGORIES_TABLE." AS c  
-				WHERE c.parent_id = ? AND c.module =?
+				WHERE c.parent_id = ? AND c.module =? AND c.type != 1
 				ORDER BY c.catid DESC LIMIT ?, ?
 			", [$parent_id, $module_name, $module_name, $parent_id, $module_name, $start_at, $entries_per_page]);
 
@@ -102,7 +102,8 @@ if (check_admin_permission($filename))
 					$catname = filter($row['catname'], "nohtml");
 					$catname_url = filter(sanitize(str2url($row['catname'])), "nohtml");
 					$catimage = filter($row['catimage'], "nohtml");
-					$cattext = filter($row['cattext'], "nohtml");
+					$cattext = filter(category_lang_text($row['cattext']), "nohtml");
+					$catdesc = stripslashes($row['catdesc']);
 					
 					$cat_title = sanitize(filter(implode("/", array_reverse(get_parent_names($catid, $nuke_categories_cacheData[$module_name], "parent_id", "catname_url"))), "nohtml"), array("/"));
 					
@@ -135,7 +136,7 @@ if (check_admin_permission($filename))
 			{
 				e.preventDefault();
 				var catid = $(this).data('catid');
-				var module_name = $(this).data('module_name');
+				var module_name = '$module';
 				var op = $(this).data('op');
 				$.ajax({
 					type : 'post',
@@ -179,16 +180,21 @@ if (check_admin_permission($filename))
 		$module = ($catid > 0) ? $nuke_categories_cacheData[$module_name][$catid]['module']:$module_name;
 		$catname = ($catid > 0) ? $nuke_categories_cacheData[$module_name][$catid]['catname']:"";
 		$catimage = ($catid > 0) ? $nuke_categories_cacheData[$module_name][$catid]['catimage']:"";
-		$cattext = ($catid > 0) ? $nuke_categories_cacheData[$module_name][$catid]['cattext']:"";
+		$cattext = ($catid > 0) ? category_lang_text($nuke_categories_cacheData[$module_name][$catid]['cattext']):"";
+		$catdesc = ($catid > 0) ? category_lang_text($nuke_categories_cacheData[$module_name][$catid]['catdesc']):"";
+		$cattext_arr = phpnuke_unserialize($nuke_categories_cacheData[$module_name][$catid]['cattext']);
 		$parent_id = ($catid > 0) ? $nuke_categories_cacheData[$module_name][$catid]['parent_id']:"";
 		
 		if(isset($update) && $update != "" && isset($cat_fields) && is_array($cat_fields) && !empty($cat_fields))
 		{
+			$cat_fields['cattext'] = (!empty($cat_fields['cattext'])) ? phpnuke_serialize($cat_fields['cattext']):"";
+			
 			if($catid > 0)
 			{
 				if($cat_fields['parent_id'] != $catid)
 				{
-					$db->query("UPDATE ".CATEGORIES_TABLE." SET catname = ?, cattext = ?, catimage = ?, parent_id = ? WHERE catid = ?", [$cat_fields['catname'], $cat_fields['cattext'], $cat_fields['catimage'], $cat_fields['parent_id'], $catid]);
+					
+					$db->query("UPDATE ".CATEGORIES_TABLE." SET catname = ?, cattext = ?, catdesc = ?, catimage = ?, parent_id = ? WHERE catid = ?", [$cat_fields['catname'], $cat_fields['cattext'], $cat_fields['catdesc'], $cat_fields['catimage'], $cat_fields['parent_id'], $catid]);
 				}
 			}
 			else
@@ -200,13 +206,21 @@ if (check_admin_permission($filename))
 								->select(["catid"]);
 				
 				if(intval($result->count()) == 0)
-					$query_set[] = array($module_name, 1, 'uncategorized', 'uncategorized', '', '0');
+				{
+					$uncategorized = array();
+					$languageslists = get_languages_data('all');
+					foreach($languageslists as $language_key => $languageslist)
+						if(!empty($languageslist))
+							$uncategorized[$language_key] = $languageslist["_".strtoupper($language_key)."_UNCAT"];
+
+					$query_set[] = array($module_name, 1, 'uncategorized', phpnuke_serialize($uncategorized), '', '0');
+				}
 				
 				$query_set[] = array($module_name, 0, $cat_fields['catname'], $cat_fields['cattext'], $cat_fields['catimage'], $cat_fields['parent_id']);
 
 				$db->table(CATEGORIES_TABLE)
 					->multiinsert(
-						['module', 'type', 'catname', 'cattext', 'catimage', 'parent_id'],
+						['module', 'type', 'catname', 'cattext', 'catdesc', 'catimage', 'parent_id'],
 						$query_set
 					);
 			}
@@ -236,17 +250,46 @@ if (check_admin_permission($filename))
 			$categories->categories_list();
 			asort($categories->result);
 		}
-		
+		$languageslists = get_dir_list('language', 'files');
 		$content="
 			<form action=\"".$admin_file.".php\" method=\"post\">
 			<table align=\"center\" border=\"0\" width=\"100%\" class=\"id-form product-table no-border\">
 				<tr>
 					<th style=\"width:150px;\">"._TITLE."</th>
 					<td><input name=\"cat_fields[catname]\" value=\"$catname\" class=\"inp-form\" size=\"40\" type=\"text\"></td>
-				</tr>
-				<tr>
+				</tr>";
+			
+				if($nuke_configs['multilingual'] != 1)
+				{
+					$content .= "<tr>
 					<th>"._DISPLAY_NAME."</th>
 					<td><input name=\"cat_fields[cattext]\" value=\"$cattext\" class=\"inp-form\" size=\"40\" type=\"text\"></td>
+				</tr>";
+				}
+				else
+				{
+					foreach($languageslists as $languageslist)
+					{
+						if($languageslist != "")
+						{
+							if($languageslist == 'index.html' || $languageslist == '.htaccess' || $languageslist == 'alphabets.php') continue;
+							$languageslist = str_replace(".php", "", $languageslist);
+							$content .= "
+							<tr>
+								<th style=\"width:160px;\">"._TITLE_INLANG." : ".ucfirst($languageslist)."</th>
+								<td>
+									<input class=\"inp-form\" name=\"cat_fields[cattext][$languageslist]\" type=\"text\" value=\"".(isset($cattext_arr[$languageslist]) ? $cattext_arr[$languageslist]:"")."\">
+								</td>
+							</tr>";
+						}
+					}
+				}
+				$content .="
+				<tr>
+					<th>"._CAT_DESC."</th>
+					<td>
+						<input name=\"cat_fields[catdesc]\" size=\"60\" type=\"text\" class=\"inp-form\" value=\"$catdesc\">
+					</td>
 				</tr>
 				<tr>
 					<th>"._CAT_IMG_LINK."</th>

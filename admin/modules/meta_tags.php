@@ -29,9 +29,9 @@ if (check_admin_permission($filename))
 
 		$pagetitle = _SEO_ADMIN;
 		
-		$site_meta_tags = $nuke_configs['site_meta_tags'];
-		$site_description = $nuke_configs['site_description'];
-		$site_keywords = ($nuke_configs['site_keywords'] != '') ? explode(",", $nuke_configs['site_keywords']):array();
+		$site_meta_tags = stripslashes($nuke_configs['site_meta_tags']);
+		$site_description = stripslashes($nuke_configs['site_description']);
+		$site_keywords = ($nuke_configs['site_keywords'] != '') ? explode(",", stripslashes($nuke_configs['site_keywords'])):array();
 		$sitename = $nuke_configs['sitename'];
 		$nukeurl = $nuke_configs['nukeurl'];
 		$gtset = $nuke_configs['gtset'];
@@ -195,7 +195,7 @@ if (check_admin_permission($filename))
 			foreach($cat_data as $catid => $catdata)
 			{
 				$catname_url = filter($catdata['catname_url'], "nohtml");
-				$cattext = filter($catdata['cattext'], "nohtml");
+				$cattext = filter(category_lang_text($catdata['cattext']), "nohtml");
 				
 				$cat_title = sanitize(filter(implode("/", array_reverse(get_parent_names($catid, $nuke_categories_cacheData[$module_name], "parent_id", "catname_url"))), "nohtml"), array("/"));
 			

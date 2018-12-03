@@ -104,7 +104,7 @@ function feedback($submit = '', $feedback_fields = array())
 			$sender_name = stripslashes(FixQuotes(check_html(removecrlf($feedback_fields['sender_name']))));
 			$sender_email = stripslashes(FixQuotes(check_html(removecrlf($feedback_fields['sender_email']))));
 			
-			$other_msg = '';
+			$other_msg = array();
 			$new_feedback_custom_fields = array();
 			
 			if(isset($feedback_fields['custom']) && is_array($feedback_fields['custom']) && !empty($feedback_fields['custom']) && is_array($feedback_custom_fields) && !empty($feedback_custom_fields))
@@ -127,7 +127,8 @@ function feedback($submit = '', $feedback_fields = array())
 					
 					$new_feedback_custom_fields[$key] = $val;
 				}
-				
+
+				$PnValidator = new GUMP();
 				if($validation_rules != '')
 					$PnValidator->validation_rules($validation_rules);
 				
@@ -298,8 +299,8 @@ function feedback($submit = '', $feedback_fields = array())
 					$field_name = $field_data['name'];
 					$field_title = $field_data['title'];
 					$field_description = (isset($field_data['description']) && $field_data['description'] != '') ? $field_data['description']:'';
-					$field_required = isset($field_data['required']) ? ' required':'';
-					$field_rule = ($field_data['data-rule'] == 'number') ? ' data-rule-'.$field_data['data-rule'].'="true"':'';
+					$field_required = (isset($field_data['required']) && $field_data['required'] == 1) ? ' required':'';
+					$field_rule = (isset($field_data['required']) && $field_data['required'] == 1 && isset($field_data['data-rule']) && $field_data['data-rule']== 'number') ? ' data-rule-'.$field_data['data-rule'].'="true"':'';
 					$field_msg = ($field_data['data-msg'] != '') ? ' data-msg-required="'.$field_data['data-msg'].'"':'';
 					$feedback_data['custom_data'][] = $field_name;
 					$contents .="<div class=\"form-group\">
@@ -357,8 +358,9 @@ function feedback($submit = '', $feedback_fields = array())
 		$contents .= "<script>
 			var feedback_data = JSON.parse('$feedback_data');
 		</script>
-		<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/feedback.js\"></script>
-		<script src=\"https://maps.googleapis.com/maps/api/js?callback=phpnukeMap&key=".$feedback_configs['google_api']."\"></script>";
+		<script src=\"".$nuke_configs['nukecdnurl']."modules/$module_name/includes/feedback.js\"></script>";
+		if($feedback_configs['map_active'] == 1)
+			$contents .="<script src=\"https://maps.googleapis.com/maps/api/js?callback=phpnukeMap&key=".$feedback_configs['google_api']."\"></script>";
 		$contents .= CloseTable();
 	}
 		

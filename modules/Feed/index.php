@@ -97,8 +97,8 @@ function feed($module_link = 'article', $mode = 'ATOM')
 	// An image is optional.
 	$TestFeed->setImage(LinkToGT($nuke_configs['nukecdnurl']."images/logo.png"), $nuke_configs['sitename'], $nuke_configs['nukeurl']);
 	$TestFeed->setChannelElementsFromArray([
-		'language' => $nuke_configs['locale'],
-		'dc:language' => $nuke_configs['language'],
+		'language' => $nuke_configs['language'],
+		'dc:language' => _LANGSMALLNAME,
 		'dc:creator' => $nuke_configs['adminmail'],
 		'dc:date' => $now,
 		'sy:updatePeriod' => 'hourly',
@@ -146,6 +146,7 @@ function feed($module_link = 'article', $mode = 'ATOM')
 			$newItem->setId(LinkToGT($feed_data['noPermaLink']));
 		//Now add the feed item
 		$TestFeed->addItem($newItem);
+		die();
 	}
 	
 	//Adding multiple elements from array
@@ -156,7 +157,7 @@ function feed($module_link = 'article', $mode = 'ATOM')
 
 	//OK. Everything is done. Now generate the feed.
 	$TestFeed->printFeed();
-
+	die();
 }
 
 function sitemap()

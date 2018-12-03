@@ -3,7 +3,7 @@
 *
 * phpBB 3.2.X Project - Persian Translation
 * Translators: PHP-BB.IR Group Meis@M Nobari
-* Version: 3.2.2 
+* Version: 3.2.3 
 *
 * @copyright (c) phpBB Limited <https://www.phpbb.com>
 * @license GNU General Public License, version 2 (GPL-2.0)
@@ -50,7 +50,7 @@ $lang = array_merge($lang, array(
 	'USER_LANG'			=> 'fa',
 
 	// You can define different rules for the determination of plural forms here.
-	// See https://area51.phpbb.com/docs/dev/32x/language/plurals.html for more information
+	// See https://area51.phpbb.com/docs/dev/32x/language/plurals.html for more informatio
 	// or ask the translation manager for help.
 	'PLURAL_RULE'		=> 1,
 
@@ -140,8 +140,10 @@ $lang = array_merge($lang, array(
 		1	=> 'کاربران حاضر در این انجمن: %2$s و %1$d مهمان',
 		2	=> 'کاربران حاضر در این انجمن: %2$s و %1$d مهمان',
 	),
+	'BUTTON_DELETE'         => 'حذف',
 	'BUTTON_EDIT'			=> 'ویرایش',
 	'BUTTON_FORUM_LOCKED'	=> 'قفل شده',
+	'BUTTON_INFORMATION'    => 'اطلاعات',
 	'BUTTON_NEW_TOPIC'		=> 'موضوع جدید',
 	'BUTTON_PM'				=> 'پیغام خصوصی',
 	'BUTTON_PM_FORWARD'		=> 'ارسال به',
@@ -150,7 +152,9 @@ $lang = array_merge($lang, array(
 	'BUTTON_PM_REPLY_ALL'	=> 'پاسخ به همه',
 	'BUTTON_POST_REPLY'		=> 'ارسال پست',
 	'BUTTON_QUOTE'			=> 'نقل قول',
+	'BUTTON_REPORT'         => 'گزارش',
 	'BUTTON_TOPIC_LOCKED'	=> 'قفل شده',
+	'BUTTON_WARN'           => 'گزارش',
 	'BYTES'					=> 'بایت',
 	'BYTES_SHORT'			=> 'بایت',
 
@@ -191,7 +195,7 @@ $lang = array_merge($lang, array(
 	'DAYS'					=> 'روز',
 	'DELETE'				=> 'حذف',
 	'DELETE_ALL'			=> 'حذف همه',
-	'DELETE_COOKIES'		=> 'حذف کوکی های انجمن',
+	'DELETE_COOKIES'		=> 'حذف کوکی ها',
 	'DELETE_MARKED'			=> 'حذف موارد انتخاب شده',
 	'DELETE_POST'			=> 'حذف پست',
 	'DELIMITER'				=> 'محدود کننده',
@@ -562,7 +566,7 @@ $lang = array_merge($lang, array(
 	),
 	'OPTIONS'					=> 'گزینه',
 
-	'PAGE_NOT_FOUND'		=> 'صفحه مورد نظر یافت نشد.',
+	'PAGE_NOT_FOUND'		=> 'صفحه درخواستی وجود ندارد',
 	'PAGE_OF'				=> 'صفحه <strong>%1$d</strong> از <strong>%2$d</strong>',
 	'PAGE_TITLE_NUMBER'		=> 'صفحه %s',
 	'PASSWORD'				=> 'کلمه عبور',
@@ -575,6 +579,7 @@ $lang = array_merge($lang, array(
 	'PM'					=> 'پیغام خصوصی',
 	'PM_REPORTED'			=> 'جهت نمایش گزارش کلیک کنید.',
 	'POSTING_MESSAGE'		=> 'ارسال پیغام خصوصی به %s',
+	'PRIVACY_LINK'			=> 'حریم شخصی',
 	'POSTING_PRIVATE_MESSAGE'	=> 'نوشتن پیغام خصوصی',
 	'POST'					=> 'پست',
 	'POST_ANNOUNCEMENT'		=> 'اطلاعیه',
@@ -734,6 +739,7 @@ $lang = array_merge($lang, array(
 	'SUBMIT'					=> 'ارسال',
 
 	'TB'				=> 'TB',
+	'TERMS_LINK'		=> 'قوانین',
 	'TERMS_USE'			=> 'قوانین استفاده',
 	'TEST_CONNECTION'	=> 'کنترل ارتباط',
 	'THE_TEAM'			=> 'لیست مدیران',

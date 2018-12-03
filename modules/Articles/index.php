@@ -76,6 +76,8 @@ function articles_home($category='', $tags='', $orderby = '')
 	global $db, $userinfo, $page, $module_name, $visitor_ip, $nuke_articles_categories_cacheData, $nuke_configs, $articles_votetype, $nuke_modules_cacheData, $nuke_authors_cacheData;
 	$link_to = "index.php?modname=$module_name";
 
+	$top_middle = ((isset($tags) && $tags != '') || (isset($page) && intval($page) != 0) || (isset($category) && $category != '')) ? false:true;
+
 	$nuke_modules_cacheData_by_title = phpnuke_array_change_key($nuke_modules_cacheData, "mid", "title");
 	
 	$nuke_categories_cacheData = get_cache_file_contents('nuke_categories');
@@ -130,7 +132,7 @@ function articles_home($category='', $tags='', $orderby = '')
 		
 	$query_set['alanguage'] = "";
 	$query_set['ihome'] = "";
-	$query_set['cat'] = "";
+	$query_set['cat'] = array();
 	$query_set['post_type'] = "(s.post_type = 'article' OR s.post_type = '')";
 	
 	if ($nuke_configs['multilingual'] == 1)
@@ -151,11 +153,12 @@ function articles_home($category='', $tags='', $orderby = '')
 		$c=1;
 		foreach($all_sub_cats as $sub_cat)
 		{
-			$query_set['cat'][] = "FIND_IN_SET(:cat_$c, cat)";
+			$query_set['cat'][] = "FIND_IN_SET(:cat_$c, s.cat)";
 			$query_params[":cat_$c"] = $sub_cat;
 			$c++;
 		}
-		$query_set['cat']= "(".implode(" OR ", $query_set['cat']).")";
+		$query_set['cat']= "(".implode(" OR ", $query_set['cat']).") OR s.cat_link = :cat_link";
+		$query_params[":cat_link"] = $catid;
 	}
 			
     if (isset($userinfo['artcle_num']) AND (isset($nuke_configs['user_pagination']) && $nuke_configs['user_pagination'] == 1))
@@ -249,7 +252,7 @@ function articles_home($category='', $tags='', $orderby = '')
 					$cat_link = sanitize(filter(implode("/", array_reverse(get_parent_names($key, $nuke_articles_categories_cacheData, "parent_id", "catname_url"))), "nohtml"), array("/"));
 					
 					if ($j==1) $sub_cats_contents .= "<tr>";
-					$sub_cats_contents .= "<td width=\"100\"><a href=\"".LinkToGT("index.php?modname=Articles&category=$cat_link")."\">".$val['cattext']."</a></td>";
+					$sub_cats_contents .= "<td width=\"100\"><a href=\"".LinkToGT("index.php?modname=Articles&category=$cat_link")."\">".category_lang_text($val['cattext'])."</a></td>";
 					if ($j==5)
 					{
 						$j=0;
@@ -333,10 +336,11 @@ function articles_home($category='', $tags='', $orderby = '')
 			$article_info['likes']				= intval($row['likes']);
 			$article_info['dislikes']			= intval($row['dislikes']);
 			$article_info['rated_id']			= intval($row['rated_id']);
-			$article_info['article_image']		= $row['article_image'];
+			//$article_info['article_image']		= $row['article_image'];
 			$article_info['title_lead']			= filter($row['title_lead'], "nohtml");
 			$article_info['title_color']		= filter($row['title_color'], "nohtml");
 			$article_info['micro_data']			= ($row['micro_data'] != "") ? phpnuke_unserialize(stripslashes($row['micro_data'])):array();
+			$article_info['article_image']		= get_article_image($article_info['sid'], $row['article_image'], $row['hometext']);
 			
 			$disabled_rating = false;
 			
@@ -354,6 +358,7 @@ function articles_home($category='', $tags='', $orderby = '')
 			if($article_info['rated_id'] > 0)
 				$disabled_rating				= true;
 			
+			$article_info['disabled_rating']	= $disabled_rating;
 			$article_info['rating_box']			= rating_load($article_info['score'], $article_info['ratings'], $article_info['likes'], $article_info['dislikes'], 'articles', "sid", $article_info['sid'], $disabled_rating, $votetype);
 			$r_options							= "";
 			$cats = ($article_info['cats'] != "") ? explode(",", $article_info['cats']):array();
@@ -363,7 +368,7 @@ function articles_home($category='', $tags='', $orderby = '')
 				{
 					if(!isset($nuke_articles_categories_cacheData[$cat])) continue;
 					$article_info['cats_data'][$cat]		= array(
-						"cattext"			=> filter($nuke_articles_categories_cacheData[$cat]['cattext'], "nohtml"),
+						"cattext"			=> filter(category_lang_text($nuke_articles_categories_cacheData[$cat]['cattext']), "nohtml"),
 						"catname"			=> filter($nuke_articles_categories_cacheData[$cat]['catname'], "nohtml"),
 						"catimage"			=> filter($nuke_articles_categories_cacheData[$cat]['catimage'], "nohtml"),
 						"catlink"			=> LinkToGT("index.php?modname=Articles&category=".filter($nuke_articles_categories_cacheData[$cat]['catname_url'], "nohtml")),
@@ -373,7 +378,7 @@ function articles_home($category='', $tags='', $orderby = '')
 			
 			if(isset($nuke_articles_categories_cacheData[$article_info['cat_link']]))
 			{
-				$article_info['cattext_link']		= filter($nuke_articles_categories_cacheData[$article_info['cat_link']]['cattext'], "nohtml");
+				$article_info['cattext_link']		= filter(category_lang_text($nuke_articles_categories_cacheData[$article_info['cat_link']]['cattext']), "nohtml");
 				$article_info['catname_link']		= filter($nuke_articles_categories_cacheData[$article_info['cat_link']]['catname'], "nohtml");
 				$article_info['catimage_link']		= filter($nuke_articles_categories_cacheData[$article_info['cat_link']]['catimage'], "nohtml");
 			}
@@ -432,7 +437,10 @@ function articles_home($category='', $tags='', $orderby = '')
 		):"",
 	);
 	
-	$boxes_contents = show_modules_boxes($module_name, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
+	if($top_middle)
+		$boxes_contents = show_modules_boxes($module_name, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
+	else
+		$boxes_contents = show_modules_boxes($module_name, array("bottom_full", "top_full","left","right"), $contents);
 
 	include("header.php");
 	$html_output .= $boxes_contents;

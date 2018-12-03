@@ -2148,11 +2148,11 @@
                 "VCHAR",
                 ""
             ],
-            "pf_phpbb_facebook": [
+            "pf_phpbb_twitter": [
                 "VCHAR",
                 ""
             ],
-            "pf_phpbb_icq": [
+            "pf_phpbb_googleplus": [
                 "VCHAR",
                 ""
             ],
@@ -2160,11 +2160,11 @@
                 "VCHAR",
                 ""
             ],
-            "pf_phpbb_twitter": [
+            "pf_phpbb_facebook": [
                 "VCHAR",
                 ""
             ],
-            "pf_phpbb_googleplus": [
+            "pf_phpbb_icq": [
                 "VCHAR",
                 ""
             ],

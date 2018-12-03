@@ -63,18 +63,17 @@ if (stristr(htmlentities($_SERVER["PHP_SELF"]), "config.php")) {
 $pn_dbhost = "localhost";
 $pn_dbuname = "root";
 $pn_dbpass = "";
-$pn_dbname = "845";
-$pn_prefix = "nuke84";
+$pn_dbname = "";
+$pn_prefix = "nuke";
 $pn_dbtype = "mysql";
 $pn_dbfetch = PDO::FETCH_ASSOC;
 $pn_dbcharset = "utf8mb4";
-
-$pn_sitekey = "dWpq2GS46AoenUHg2Fv7vxn75paojipGV1Saf5Cd";
+$pn_sitekey = "";
 $pn_subscription_url = "";
 $pn_tipath = "images/topics/";
 $pn_cache_type = "MySQL";
 $admin_file = "admin";
-$pn_salt = "u!0AN|3~i+|~mnj";
+$pn_salt = "";
 
 /*********************************************************************/
 /* You finished to configure the Database. Now you can change all    */

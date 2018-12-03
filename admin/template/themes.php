@@ -55,8 +55,11 @@ function jquery_codes_load($plugins="", $reload = false)
 
 function adminheader_popup($pagetitle)
 {
-	global $db, $this_place, $admin_file, $pagetitle, $nuke_configs;
+	global $db, $this_place, $admin_file, $nuke_configs;
 
+	if(!isset($pagetitle))
+		global $pagetitle;
+	
 	$contents = '';
 	if(!isset($this_place))
 	{
@@ -130,7 +133,11 @@ $contents .= "<!DOCTYPE html>
 
 function adminheader($pagetitle, $meta_tags, $has_micrometa)
 {
-global $db, $this_place, $admin_file, $pagetitle, $is_popup, $nuke_authors_cacheData, $aid, $nuke_configs, $admin_top_menus;
+global $db, $this_place, $admin_file, $is_popup, $nuke_authors_cacheData, $aid, $nuke_configs, $admin_top_menus;
+
+if(!isset($pagetitle))
+	global $pagetitle;
+	
 $contents = '';
 if(defined('IS_POPUP'))
 {

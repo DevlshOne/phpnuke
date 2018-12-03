@@ -52,7 +52,7 @@ if(isset($nuke_banned_ip_cacheData) && is_array($nuke_banned_ip_cacheData) && !e
 	}
 }
 
-if($nuke_configs['mtsn_ddos_filter'] == 1 || !$pn_Bots->isCrawler())
+if($nuke_configs['mtsn_ddos_filter'] == 1 || !$pn_Bots->isCrawler() && !isset($timthumb) && !stristr($nuke_configs['nukeurl'], "thumb/"))
 {
 	$mtsn_requests_pages = isset($nuke_configs['mtsn_requests_pages']) ? intval($nuke_configs['mtsn_requests_pages']):7;
 	$mtsn_requests_mintime = isset($nuke_configs['mtsn_requests_mintime']) ? intval($nuke_configs['mtsn_requests_mintime']):2;

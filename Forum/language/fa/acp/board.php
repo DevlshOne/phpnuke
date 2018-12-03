@@ -294,8 +294,7 @@ $lang = array_merge($lang, array(
 	'ACP_FEED_TOPICS_ACTIVE'			=> 'فعال سازی خوراک موضوعات فعال',
 	'ACP_FEED_TOPICS_ACTIVE_EXPLAIN'	=> 'فعال سازی خوراک "موضوعات فعال" که شامل فعال ترین موضوعات است.',
 	'ACP_FEED_NEWS'						=> 'خوراک اخبار',
-	'ACP_FEED_NEWS_EXPLAIN'				=> 'اولین پست این انجمن ها را جای دهید برای غیرفعالل کردن،هیچ انجمنی را انتخاب نکنید.<br>با نگه داشتن <samp>CTRL</samp> و کلیک بر روی نام های انجمن ها می توانید به سادگی چند مورد را همزمان انتخاب و یا لغو انتخاب کنید.',
-
+	'ACP_FEED_NEWS_EXPLAIN'				=> 'اولین پست این انجمن ها را جای دهید برای غیرفعال کردن،هیچ انجمنی را انتخاب نکنید.<br>با نگه داشتن <samp>CTRL</samp> و کلیک بر روی نام های انجمن ها می توانید به سادگی چند مورد را همزمان انتخاب و یا لغو انتخاب کنید.',
 	'ACP_FEED_OVERALL_FORUMS'			=> 'فعال سازی خوراک انجمن ها',
 	'ACP_FEED_OVERALL_FORUMS_EXPLAIN'	=> 'فعال سازی خوراک "همه انجمن ها" که لیستی از تمامی انجمن ها را نمایش می دهد.',
 
@@ -352,8 +351,8 @@ $lang = array_merge($lang, array(
 
 // Cookie Settings
 $lang = array_merge($lang, array(
-	'ACP_COOKIE_SETTINGS_EXPLAIN'		=> 'این گزینه ها جزئیات نحوه ارسال کوکی ها به مرورگر را تعیین می کنند. در اغلب موارد تنظیمات پیشفرض برای کوکی ها کافی است. اگر خواستار تغییر این تنظیمات باشید باید دقت کافی به عمل آورید زیرا تنظیمات نا درست از ورود کاربران جلوگیری خواهد کرد چنانچه مشکلاتی با ورود کاربران به تالار دارید به این لینک مراجعه کنید  <b><a href="https://www.phpbb.com/support/go/cookie-settings/">phpBB.com Knowledge Base - Fixing incorrect cookie settings</a></b>',
-
+	'ACP_COOKIE_SETTINGS_EXPLAIN'		=> 'این گزینه ها جزئیات نحوه ارسال کوکی ها به مرورگر را تعیین می کنند. در اغلب موارد تنظیمات پیشفرض برای کوکی ها کافی است. اگر خواستار تغییر این تنظیمات باشید باید دقت کافی به عمل آورید زیرا تنظیمات نا درست از ورود کاربران جلوگیری خواهد کرد چنانچه مشکلاتی با ورود کاربران به تالار دارید به این لینک مراجعه کنید  <strong><a href="https://www.phpbb.com/support/go/cookie-settings/">phpBB.com Knowledge Base - Fixing incorrect cookie settings</a></strong>',
+	
 	'COOKIE_DOMAIN'				=> 'دامنه کوکی',
 	'COOKIE_DOMAIN_EXPLAIN'		=> 'در بیشتر مواقع دامنه کوکی تنظیم است. چنانچه مطمئن نیستید آن را خالی بگذارید.<br><br>اما اگر تالار شما با برنامه دیگری هماهنگ شده و یا از دامنه های بیشتری استفاده میکنید, آنگاه طبق دستور زیر تنظیمات کوکی را انجام دهید.ج. اگر چیزی شبیه این دارید <i>example.com</i> و <i>forums.example.com</i>,یا شاید <i>forums.example.com</i> و <i>blog.example.com</i>. زیردامنه ها را حذف کنید تا دامنه اصلی مشخص شود, <i>example.com</i>. حالا یک نقطه به جلو دامنه اضافه  کنید مانند .example.com توجه: نقطه در ابتدا است در این مثال).',
 	'COOKIE_NAME'				=> 'نام کوکی',
@@ -361,7 +360,7 @@ $lang = array_merge($lang, array(
 	'COOKIE_NOTICE'				=> 'اطلاعیه کوکی',
 	'COOKIE_NOTICE_EXPLAIN'		=> 'اگراطلاعیه کوکی را فعال کنید ، هنگام بازدید کاربران به آنها نمایش داده میشود. این ممکن است بستگی به قوانین محتوی تعیین شده هیئت مدیره تالار باشد.',
 	'COOKIE_PATH'				=> 'مسیر کوکی',
-	'COOKIE_PATH_EXPLAIN'		=> 'همیشه باید یک اسلش باشد و مه نیست دامنه شما چیست',
+	'COOKIE_PATH_EXPLAIN'		=> 'معمولا آدرس اسکپریت شماست یا به صورت یک اسلش / برای در دسترس بودن دامنه شما خواهد بود',
 	'COOKIE_SECURE'				=> 'کوکی امن',
 	'COOKIE_SECURE_EXPLAIN'		=> 'اگر سرور شما با SSL اجرا می شود، این گزینه را فعال کنید در غیر این صورت، در آن تغییراتی ایجاد نکنید. اگر این گزینه را فعال کنید و سرور با SSL اجرا نشود در این صورت خطاهایی در انتقال کاربران رخ خواهد داد.',
 	'ONLINE_LENGTH'				=> 'محدودیت زمانی آنلاین بودن کاربران',
@@ -376,7 +375,7 @@ $lang = array_merge($lang, array(
 
 	'CONTACT_US_ENABLE'				=> 'فعال سازی تماس با ما',
 	'CONTACT_US_ENABLE_EXPLAIN'		=> 'در این صفحه کاربران میتوانند با مدیریت کل سایت از طریق ایمیل ارتباط برقرار کنند لطفا توجه داشته باشید که باید تنظیمات ایمیل فعال باشد. تنظیمات مربوطه در بخش اصلی و تنظیمات ایمیل وجود دارد.',
-
+	
 	'CONTACT_US_INFO'				=> 'اطلاعات تماس',
 	'CONTACT_US_INFO_EXPLAIN'		=> 'این متن در صفحه تماس با ما نمایش داده خواهد شد.',
 	'CONTACT_US_INFO_PREVIEW'		=> 'اطلاعات و پیش نمایش صفحه تماس با ما',
@@ -408,6 +407,8 @@ $lang = array_merge($lang, array(
 	'READ_NOTIFICATION_EXPIRE_DAYS_EXPLAIN' => 'تعداد روزهای مشخص جهت حذف "یادآوری ها" خوانده شده به صورت اتومات، مقدا 0 باعث میشود هیچگاه "یادآوری ها" حذف نشوند.',
 	'RECOMPILE_STYLES'				=> ' تألیف مجدد اجزای فرسوده ی قالب',
 	'RECOMPILE_STYLES_EXPLAIN'		=> 'بروزرسانی های اجزای قالب را در سیتم های فایل کنترل کرده و آنها را تألیف می کند.',
+	'YES_ACCURATE_PM_BUTTON'			=> 'دسترسی نمایش دکمه پیام خصوصی در صفحه موضوعات',
+	'YES_ACCURATE_PM_BUTTON_EXPLAIN'	=> 'با فعال سازی این گزینه ،در قسمت پروفایل کاربر در پست ها ، دکمه ارسال پیغام خصوصی به نمایش در خواهد آمد.',
 	'YES_ANON_READ_MARKING'			=> 'فعال سازی علامت گذاری موضوعات برای مهمان ها',
 	'YES_ANON_READ_MARKING_EXPLAIN'	=> 'اطلاعات خوانده شده/خوانده نشده را برای مهمان ها ذخیره می کند. اگر غیرفعال شوند،پست ها همیشه برای مهمان ها به عنوان خوانده شده علامت گذاری خواهند شد.',
 	'YES_BIRTHDAYS'					=> 'فعال سازی لیست تولد ها',
@@ -567,8 +568,8 @@ $lang = array_merge($lang, array(
 	'CONTACT_EMAIL_EXPLAIN'			=> 'این آدرس ایمیل هنگامی استفاده خواهد شد که پشتیبانی ای از طریق ایمیل مورد نیاز باشد. برای مثال اسپم،خطا ها و غیره... . همیشه در ایمیل ها به عنوان <samp>از</samp> و <samp>پاسخ به</samp> استفاده خواهد شد.',
 	'CONTACT_EMAIL_NAME'			=> 'نام تماس',
 	'CONTACT_EMAIL_NAME_EXPLAIN'	=> 'نامی که گیرنده های تماس آن را مشاهده خواهند کرد. چنانچه مایل به گذاشتن نامی نیستید این گزینه را خالی بگذارید.',
-	'EMAIL_FORCE_SENDER'			=> 'اجبار برای ایمیل آدرس',
-	'EMAIL_FORCE_SENDER_EXPLAIN'	=> 'این تنظیمات به <samp>مسیر بازگشت ایمیل</samp> به جای استفاده از سرور داخلی کاربر ایمیل داده میشود. این تنظیمات وقتی SMTP فعال باشد عمل نخواهد کرد.<br><em><strong>هشدار:</strong> نیازمند تنظیمات ارسال ایمیل کاربری و اعتماد سازی کاربری ادر بخش وب سرور است</em>',
+	'EMAIL_FORCE_SENDER'			=> 'Force from email address',
+	'EMAIL_FORCE_SENDER_EXPLAIN'	=> 'This will set the <samp>Return-Path</samp> to the from email address instead of using the local user and hostname of the server. This setting does not apply when using SMTP.<br><em><strong>Warning:</strong> Requires the user that the webserver runs as to be added as trusted user to the sendmail configuration.</em>',
 	'EMAIL_PACKAGE_SIZE'			=> 'حجم بسته ایمیل',
 	'EMAIL_PACKAGE_SIZE_EXPLAIN'	=> 'این حداکثر تعداد ایمیلی می باشد که می توان در یک بسته ارسال کرد این تنظیمات در پیغام های داخلی اعمال می شود. اگر با مشکلی در ارسال ایمیل ها روبرو شدید این گزینه را با وارد کردن 0 غیرفعال کنید.',
 	'EMAIL_SIG'						=> 'امضای ایمیل',
@@ -590,15 +591,15 @@ $lang = array_merge($lang, array(
 	'SMTP_POP_BEFORE_SMTP'			=> 'POP-BEFORE-SMTP',
 	'SMTP_PORT'						=> 'پورت سرور SMTP',
 	'SMTP_PORT_EXPLAIN'				=> 'این گزینه را فقط هنگامی استفاده کنید که مطمئن باشید سرور شما در پورت دیگری جز این اجرا می شود.',
-	'SMTP_SERVER'					=> 'آدرس سرور SMTP',
+	'SMTP_SERVER'					=> 'آدرس سرور SMTP و قوانین',
 	'SMTP_SERVER_EXPLAIN'			=> 'توجه کنید که سرور شما باید پروتوکل های مربوطه را پشتیبانی کند اگر هم از SSL استفاده میکند باید از"ssl://your.mailserver.com" استفاده کنید.',
 	'SMTP_SETTINGS'					=> 'تنظیمات SMTP',
 	'SMTP_USERNAME'					=> 'نام کاربری SMTP',
 	'SMTP_USERNAME_EXPLAIN'			=> 'فقط هنگامی کلمه عبور را وارد کنید که سرور ایمیل آن را خواسته باشد.',
 	'SMTP_VERIFY_PEER'				=> 'تایید گواهی SSL',
-	'SMTP_VERIFY_PEER_EXPLAIN'		=> 'نیاز به تایید گواهی SSL توسط سرور SMTP <em><strong>هشدار:</strong> اتصال نظیر با گواهینامه SSL تایید نشده ممکن است مشکلات امنیتی بوجود آورد</em>',
+	'SMTP_VERIFY_PEER_EXPLAIN'		=> 'نیاز به تایید گواهی SSL توسط سرور SMTP <br><em><strong>هشدار:</strong> اتصال نظیر با گواهینامه SSL تایید نشده ممکن است مشکلات امنیتی بوجود آورد</em>',
 	'SMTP_VERIFY_PEER_NAME'			=> 'تایید SMTP',
-	'SMTP_VERIFY_PEER_NAME_EXPLAIN'	=> 'نیاز به تایید نام نظیر برای سرور SMYP با استفاده از اتصال SSL / TLS <em><strong>هشدار:</strong> اتصال با تاییده نا معتبر باعث ایجاد مشکلات امنیتی خواهد شد. </em>',
+	'SMTP_VERIFY_PEER_NAME_EXPLAIN'	=> 'نیاز به تایید نام نظیر برای سرور SMYP با استفاده از اتصال SSL / TLS <br><em><strong>هشدار:</strong> اتصال با تاییده نا معتبر باعث ایجاد مشکلات امنیتی خواهد شد. </em>',
 	'TEST_EMAIL_SENT'				=> 'ایمیل آزمایشی ارسال شد.<br>اگر ایمیل به دست شما نرسید تنظیمات بخش ایمیل را بررسی کنید.<br><br>اگر نیاز به کمک بیشتری دارید, به بخش پشتیبانی مراجعه کنید <a href="https://www.phpbb.com/community/">بخش پشتیبانی</a>.',
 	'USE_SMTP'						=> 'استفاده از سرور SMTP برای ایمیل',
 	'USE_SMTP_EXPLAIN'				=> 'برای ارسال ایمیل ها به وسیله سرور SMTP به جای تابع PHP ایمیل، "بله" را انتخاب کنید.',
@@ -629,5 +630,5 @@ $lang = array_merge($lang, array(
 	'JAB_VERIFY_PEER'				=> 'تایید گواهینامه SSL',
 	'JAB_VERIFY_PEER_EXPLAIN'		=> 'نیاز به تایید گواهینامه SSL برای استفده از سرور Jabber <br><em><strong>هشدار:</strong> اتصال نظیر با تاییدیه نا معتبرممکن اس باعث ایجاد مشکلات امنیتی شود </em>',
 	'JAB_VERIFY_PEER_NAME'			=> 'تایید نام نظیر Jabber',
-	'JAB_VERIFY_PEER_NAME_EXPLAIN'	=> 'نیاز به تایید یک سرور Jabber که از ارتباط SSL / TSL استفاده میکند <em><strong>هشدار:</strong>اتصال نظیر نا معتبر باعث ایجاد مشکلات امنیتی خواهد شد </em>',
+	'JAB_VERIFY_PEER_NAME_EXPLAIN'	=> 'نیاز به تایید یک سرور Jabber که از ارتباط SSL / TSL استفاده میکند <br><em><strong>هشدار:</strong>اتصال نظیر نا معتبر باعث ایجاد مشکلات امنیتی خواهد شد </em>',
 ));

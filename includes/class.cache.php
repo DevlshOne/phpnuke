@@ -238,7 +238,7 @@ class Cache {
 	public function flush_caches()
 	{
 		$cachePath = $this->getCachePath();
-		$cache_files = get_dir_list($cachePath, $options='files');
+		$cache_files = get_dir_list($cachePath, 'files');
 		foreach($cache_files as $cache_file)
 		{
 			if($cache_file == '.htaccess' || $cache_file == 'index.html')

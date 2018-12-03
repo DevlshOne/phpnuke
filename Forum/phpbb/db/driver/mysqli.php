@@ -68,7 +68,7 @@ class mysqli extends \phpbb\db\driver\mysql_base
 
 		if ($this->db_connect_id && $this->dbname != '')
 		{
-			@mysqli_query($this->db_connect_id, "SET NAMES 'utf8'");
+			//@mysqli_query($this->db_connect_id, "SET NAMES 'utf8'");
 
 			// enforce strict mode on databases that support it
 			if (version_compare($this->sql_server_info(true), '5.0.2', '>='))

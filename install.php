@@ -40,13 +40,18 @@ error_reporting(E_ALL);
 if(isset($_GET['op']))
 {
 	require_once("mainfile.php");
-	$pn_Sessions->sPrefix = 'pnSession_';
 }
 else
 {
 	// Get php version
 	$phpver = phpversion();
+	//// Set IRAN Time
+	if ($phpver >= '5.1.0')
+	{
+		date_default_timezone_set('Asia/Tehran');
+	}
 	define("NUKE_FILE", true);
+	define("_NOWTIME", time());
 	if($phpver >= '5.4.0')
 	{
 		$methods = array("_GET","_POST","_REQUEST","_FILES");
@@ -75,9 +80,9 @@ else
 	require_once("includes/class.sessions.php");
 	require_once("includes/class.cache.php");
 
+	$pn_salt = "";
 	// setup 'default' cache
 	$cache = new Cache();
-	$pn_Sessions = new pn_Sessions();
 	require_once("includes/constants.php");
 	include_once('db/Database.php');
 	// Request URL Redirect To Nuke Url
@@ -93,12 +98,13 @@ else
 	$Redirect_Url 	= substr($Req_URI,strlen($Req_URL),strlen($Req_URL));
 }
 
-global $db, $nuke_configs, $pn_Sessions;
+global $db, $nuke_configs;
 
-if($pn_Sessions->exists('install_options'))
+if($cache->isCached('install_options'))
 {
-	$install_options = $pn_Sessions->get('install_options', false);
+	$install_options = $cache->retrieve('install_options');
 	$install_options = phpnuke_unserialize($install_options);
+
 	if(isset($install_options['admininfo']) && isset($install_options['db_info']))
 	{
 		if($install_options['mode'] == 'upgrade')
@@ -112,11 +118,11 @@ if($pn_Sessions->exists('install_options'))
 
 function upgrade_header($step = 1, $progress = 0)
 {
-	global $db, $nuke_configs, $pn_Sessions;
+	global $db, $nuke_configs, $cache;
 	
-	if($pn_Sessions->exists('install_options'))
+	if($cache->isCached('install_options'))
 	{
-		$install_options = $pn_Sessions->get('install_options', false);
+		$install_options = $cache->retrieve('install_options');
 		$install_options = phpnuke_unserialize($install_options);
 	}
 	else
@@ -211,9 +217,8 @@ function upgrade_footer()
 
 function upgrade_start()
 {
-	global $pn_Sessions, $cache;
+	global $cache;
 	
-	$pn_Sessions->destroy();
 	$cache->flush_caches();
 	
 	upgrade_header(0);
@@ -243,7 +248,7 @@ function upgrade_start()
 
 function step_db()
 {
-	global $db, $nuke_configs, $mode, $pn_Sessions;
+	global $db, $nuke_configs, $mode, $cache;
 	
 	$install_options = array();
 	
@@ -251,8 +256,8 @@ function step_db()
 	
 	$install_options['mode'] = $mode;
 	
-	$pn_Sessions->set("install_options", phpnuke_serialize($install_options));
-	
+	$cache->store("install_options", phpnuke_serialize($install_options));
+
 	upgrade_header(2, 20);
 	echo"
 	<form role=\"form\" class=\"form-horizontal\" id=\"nukeform\" action=\"install.php?step=server_check\" method=\"post\">
@@ -355,9 +360,9 @@ function step_db()
 
 function step_server_check()
 {
-	global $db, $nuke_configs, $db_fields, $pn_Sessions, $pn_dbtype, $pn_dbfetch, $pn_dbcharset;
-	
-	if(!$pn_Sessions->exists('install_options'))
+	global $db, $nuke_configs, $db_fields, $cache, $pn_dbtype, $pn_dbfetch, $pn_dbcharset;
+
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(3, 40);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -377,14 +382,14 @@ function step_server_check()
 	if(!$import_db)
 		$errors[] = "در حال حاضر مشکلي در ارتباط با تنظيمات بانک اطلاعاتي وجود دارد";
 	
-	$install_options = $pn_Sessions->get('install_options', false);
+	$install_options = $cache->retrieve('install_options');
 	
 	$install_options = phpnuke_unserialize($install_options);
 	
 	$install_options['db_info'] = $db_fields;
 	$install_options['db_info']['db_prefix'] = ($install_options['db_info']['db_prefix'] == '') ? "nuke":$install_options['db_info']['db_prefix'];
 	
-	$pn_Sessions->set("install_options", phpnuke_serialize($install_options));
+	$cache->store("install_options", phpnuke_serialize($install_options));
 	
 	upgrade_header(3, 40);
 	
@@ -572,9 +577,9 @@ function step_server_check()
 
 function step_siteinfo()
 {
-	global $db, $nuke_configs, $mode, $pn_Sessions, $Req_URL;
+	global $db, $nuke_configs, $mode, $cache, $Req_URL;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(4, 60);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -589,7 +594,7 @@ function step_siteinfo()
 		die();
 	}
 	
-	$install_options = $pn_Sessions->get('install_options', false);
+	$install_options = $cache->retrieve('install_options');
 	$install_options = phpnuke_unserialize($install_options);
 	
 	upgrade_header(4, 60);
@@ -628,9 +633,9 @@ function step_siteinfo()
 
 function step_admin_info()
 {
-	global $db, $nuke_configs, $install_fields, $pn_Sessions;
+	global $db, $nuke_configs, $install_fields, $cache;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(5, 80);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -645,11 +650,11 @@ function step_admin_info()
 		die();
 	}
 	
-	$install_options = $pn_Sessions->get('install_options', false);
+	$install_options = $cache->retrieve('install_options');
 	$install_options = phpnuke_unserialize($install_options);
 	$install_options['siteinfo'] = $install_fields;
 	
-	$pn_Sessions->set("install_options", phpnuke_serialize($install_options));
+	$cache->store("install_options", phpnuke_serialize($install_options));
 	$step_title = ($install_options['mode'] == 'install') ? "اطلاعات مدیر جدید":"اطلاعات نسخه قدیم";
 	upgrade_header(5, 80);
 	echo"
@@ -735,9 +740,9 @@ function step_admin_info()
 
 function step_install()
 {
-	global $db, $nuke_configs, $install_fields, $pn_Sessions, $pn_dbtype, $pn_dbfetch, $pn_dbcharset;
+	global $db, $nuke_configs, $install_fields, $cache, $pn_dbtype, $pn_dbfetch, $pn_dbcharset;
 
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -752,11 +757,11 @@ function step_install()
 		die();
 	}
 	
-	$install_options = $pn_Sessions->get('install_options', false);
+	$install_options = $cache->retrieve('install_options');
 	$install_options = phpnuke_unserialize($install_options);
 	$install_options['admininfo'] = $install_fields;
 	
-	if($install_options['admininfo']['admin_filename'] != 'admin' && file_exists("admin.php") && !file_exists($install_options['admininfo']['admin_filename'].".php"))
+	if($install_options['admininfo']['admin_filename'] != '' && $install_options['admininfo']['admin_filename'] != 'admin' && file_exists("admin.php") && !file_exists($install_options['admininfo']['admin_filename'].".php"))
 	{
 		if(!rename("admin.php", $install_options['admininfo']['admin_filename'].".php"))
 		{
@@ -774,9 +779,12 @@ function step_install()
 		}
 	}
 	
-	change_config_content($install_options);
-	
-	$pn_Sessions->set("install_options", phpnuke_serialize($install_options));
+	global $pn_salt;
+	$pn_salt = change_config_content($install_options);
+
+	$cache = new Cache();
+	$cache->flush_caches();
+	$cache->store("install_options", phpnuke_serialize($install_options));
 	
 	$errors = array();
 	
@@ -818,7 +826,7 @@ function step_install()
 	$DB_obj->db_connection_charset = $pn_dbcharset;
 	
 	$result = $DB_obj->read_sql_url($filename, 1, 0, ";", 0);
-	$result = objectToArray(json_decode($result));
+	//$result = objectToArray(json_decode($result));
 	
 	// Get a listing of all tables
 	//$tables_result = $import_db->query("SELECT TABLE_NAME FROM `information_schema`.`TABLES` WHERE TABLE_SCHEMA =  '".$install_options['db_info']['db_name']."'");
@@ -848,9 +856,10 @@ function step_install()
 	
 	if($install_options['db_info']['db_prefix'] != 'nuke')
 	{
-		$rename_query = implode(", ", $rename_query);
+		//$rename_query = implode(", ", $rename_query);
 		// Rename the actual table
-		$import_db->query("RENAME TABLE ".$rename_query);
+		foreach($rename_query as $rename_q)
+			$import_db->query("RENAME TABLE ".$rename_q);
 	}
 	
 	upgrade_header(6, (($install_options['mode'] == 'install') ? 100:90));
@@ -863,8 +872,8 @@ function step_install()
 				<div class=\"wizard-input-section\">
 					<div class=\"alert alert-success\">
 						<span class=\"create-server-name\"></span>جداول نیوک شما <strong>با موفقیت نصب شد.</strong>
-					</div>
-					<table width=\"100%\">
+					</div>";
+					/*<table width=\"100%\">
 						<tr>
 							<th class=\"text-center\" style=\"width:40%\">عنوان</th>
 							<th class=\"text-center\" style=\"width:15%\">در حال کار</th>
@@ -893,7 +902,8 @@ function step_install()
 							<td id=\"byte-togo\" align=\"center\" dir=\"ltr\">".$result['bytes_togo']."</td>
 							<td id=\"byte-total\" align=\"center\" dir=\"ltr\">".$result['bytes_tota']."</td>
 						</tr>
-					</table><br /><br /><p align=\"center\">";
+					</table><br /><br />*/
+					echo"<p align=\"center\">";
 					if($install_options['mode'] == 'install')
 					{
 					echo"
@@ -914,6 +924,8 @@ function step_install()
 
 function change_config_content($install_options)
 {
+
+$pn_salt = random_str(15, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$~%^&*()_-+|');
 
 $file_contents = '<?php
 
@@ -979,7 +991,7 @@ if (stristr(htmlentities($_SERVER["PHP_SELF"]), "config.php")) {
 
 $pn_dbhost = "'.$install_options['db_info']['db_server_name'].'";
 $pn_dbuname = "'.$install_options['db_info']['db_username'].'";
-$pn_dbpass = "'.$install_options['db_info']['db_password'].'";
+$pn_dbpass = \''.$install_options['db_info']['db_password'].'\';
 $pn_dbname = "'.$install_options['db_info']['db_name'].'";
 $pn_prefix = "'.$install_options['db_info']['db_prefix'].'";
 $pn_dbtype = "mysql";
@@ -991,7 +1003,7 @@ $pn_subscription_url = "";
 $pn_tipath = "images/topics/";
 $pn_cache_type = "MySQL";
 $admin_file = "'.$install_options['admininfo']['admin_filename'].'";
-$pn_salt = \''.random_str(15, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@#$~%^&*()_-+|').'\';
+$pn_salt = \''.$pn_salt.'\';
 
 /*********************************************************************/
 /* You finished to configure the Database. Now you can change all    */
@@ -1027,12 +1039,12 @@ $commercial_license = 0;
     $fp = fopen('config.php', 'w');
     fputs($fp, $file_contents);
     fclose($fp);
-
+	return $pn_salt;
 }
 
 function upgrade_progress_output($pagetitle = '', $total_rows = 0, $fetched_rows = 0, $start = 0, $finish_page = '', $in_progress_page = '', $total_progress = 0, $total_proccess = 500)
 {
-	global $nuke_configs, $pn_Sessions, $install_options;
+	global $nuke_configs, $cache, $install_options;
 
 	$percent = ($fetched_rows == 0 || ($fetched_rows > 0 && $fetched_rows < $total_proccess && $start != 0) || ($fetched_rows > 0 && $fetched_rows == $total_rows)) ? 100:(int)((($fetched_rows+$start)/$total_rows)*100);
 	
@@ -1083,7 +1095,17 @@ function upgrade_progress_output($pagetitle = '', $total_rows = 0, $fetched_rows
 
 function upgrade_first()
 {
-	global $db, $nuke_configs, $pn_Sessions, $install_options, $install_fields, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $install_options, $install_fields, $pn_dbcharset;
+	
+	$languages_list = array();
+	$all_languages = get_dir_list('language', "files", true);
+	foreach($all_languages as $language)
+	{
+		if($language == 'index.html' || $language == '.htaccess' || $language == 'alphabets.php') continue;
+		$language = str_replace(".php", "", $language);
+		$languages_list[] = $language;
+	}
+	
 	$default_admin = "admin";
 	$default_admin_pwds = array();
 	// update nuke_authors
@@ -1092,7 +1114,7 @@ function upgrade_first()
 	
 	if(isset($install_fields) && isset($install_fields['pwd']) && !empty($install_fields['pwd']))
 	{
-		if(!$pn_Sessions->exists('install_options'))
+		if(!$cache->isCached('install_options'))
 		{
 			upgrade_header(7, 95);
 			echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -1107,10 +1129,10 @@ function upgrade_first()
 			die();
 		}
 		
-		$install_options = $pn_Sessions->get('install_options', false);
+		$install_options = $cache->retrieve('install_options');
 		$install_options = phpnuke_unserialize($install_options);
 		$install_options['admininfo']['pwd'] = $install_fields['pwd'];
-		$pn_Sessions->set("install_options", phpnuke_serialize($install_options));
+		$cache->store("install_options", phpnuke_serialize($install_options));
 	}	
 	
 	if(intval($result->count()) > 0)
@@ -1123,7 +1145,7 @@ function upgrade_first()
 			{
 				$default_admin_pwds[] = $row['pwd'];
 				$default_admin = $row['aid'];
-				$pn_Sessions->set('default_admin', $default_admin);
+				$cache->store('default_admin', $default_admin);
 			}
 			$insert_query[] = array($row['aid'],$row['name'],$row['url'],$row['email'],$row['pwd'],$row['counter'],$row['radminsuper'],$row['admlanguage'],$row['aadminsuper']);
 		}
@@ -1183,10 +1205,13 @@ function upgrade_first()
 			$db->table(ADMINS_MENU_TABLE)->multiinsert(array("amid","atitle","admins"),$insert_query);
 	}*/
 
-	// update nuke_blocks
+	
+	// update nuke_blocks AND nuke_messages
 	$db->query("set names 'latin1'");
 	$insert_query1 = array();
 	$box_blocks_data = array();
+	$top_center_weight = 1;
+	$last_bid = 0;
 	$result = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_blocks` ORDER BY bposition ASC, weight ASC");
 	if(intval($result->count()) > 0)
 	{
@@ -1195,7 +1220,9 @@ function upgrade_first()
 		{
 			if($row['blockfile'] != '' && !file_exists("blocks/".$row['blockfile'].""))
 				continue;
-				
+			
+			$last_bid = max($last_bid, $row['bid']);
+			
 			$lang_titles = array();
 			$result2 = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_blocks_titles` WHERE bid = '".$row['bid']."'");
 			if(intval($result2->count()) > 0)
@@ -1226,6 +1253,8 @@ function upgrade_first()
 				break;
 			}
 			
+			$top_center_weight = max($top_center_weight, $row['weight']);
+			
 			$box_blocks_data[$box_id][$row['bid']] = array(
 				"title" => $row['title'],
 				"lang_titles" => ((!empty($lang_titles)) ? phpnuke_serialize($lang_titles):""),
@@ -1242,6 +1271,40 @@ function upgrade_first()
 			
 			$insert_query1[] = array($row['bid'],$row['title'],$row['content'],$row['url'],$row['refresh'],$row['blockfile']);
 		}
+		
+		$result = $db->query("SELECT * FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_message`");
+		if(intval($result->count()) > 0)
+		{	
+			$rows = $result->results();
+			foreach($rows as $row)
+			{
+				$lang_titles = array();
+				foreach($languages_list as $languages_name)
+				{
+					$lang_titles[$languages_name] = $row['title'];
+				}
+				
+				$last_bid++;
+				$box_id = "topcenter";
+				$top_center_weight++;
+				$box_blocks_data[$box_id][$last_bid] = array(
+					"title" => $row['title'],
+					"lang_titles" => ((!empty($lang_titles)) ? phpnuke_serialize($lang_titles):""),
+					"blanguage" => $row['mlanguage'],
+					"weight" => $top_center_weight,
+					"active" => $row['active'],
+					"time" => $row['date'],
+					"permissions" => $row['view'],
+					"publish" => 0,
+					"expire" => $row['expire'],
+					"action" => "d",
+					"theme_block" => '',
+				);
+				
+				$insert_query1[] = array($last_bid, $row['title'],$row['content'], '', '', '');
+			}
+		}
+		
 		$db->query("set names '$pn_dbcharset'");
 		if(isset($insert_query1) && !empty($insert_query1))
 			$blocks_insert = $db->table(BLOCKS_TABLE)->multiinsert(array("bid","title","content","url","refresh","blockfile"),$insert_query1);
@@ -1638,9 +1701,9 @@ function upgrade_first()
 
 function upgrade_comments($start = 0)
 {
-	global $db, $nuke_configs, $pn_Sessions, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $pn_dbcharset;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -1701,7 +1764,7 @@ function upgrade_comments($start = 0)
 		{
 			if(!$total_rows_set)
 			{
-				$pn_Sessions->set('total_rows', intval($row['total_rows']));
+				$cache->store('total_rows', intval($row['total_rows']));
 				unset($row['total_rows']);
 				$total_rows_set = true;
 			}
@@ -1742,16 +1805,16 @@ function upgrade_comments($start = 0)
 	}
 	
 	$new_start = $start+500;
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$total_rows = $cache->retrieve('total_rows');
 	
 	upgrade_progress_output("انتقال نظرات", $total_rows, $fetched_rows, $start, "install.php?op=feedbacks", "install.php?op=comments&start=$new_start", 16, 500);
 }
 
 function upgrade_feedbacks($start)
 {
-	global $db, $nuke_configs, $pn_Sessions, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $pn_dbcharset, $transfer_counter;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -1766,10 +1829,12 @@ function upgrade_feedbacks($start)
 		die();
 	}
 	
+	
+	$transfer_counter = (isset($transfer_counter) && $transfer_counter != 0) ? $transfer_counter:500;
 	// update nuke_feedbacks
 	$db->query("set names 'latin1'");
 	$insert_query = array();
-	$result = $db->query("SELECT *, (SELECT COUNT(fid) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_feedbacks`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_feedbacks` ORDER BY fid ASC LIMIT $start, 500");
+	$result = $db->query("SELECT *, (SELECT COUNT(fid) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_feedbacks`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_feedbacks` ORDER BY fid ASC LIMIT $start, $transfer_counter");
 	$fetched_rows = intval($result->count());
 	if($fetched_rows > 0)
 	{
@@ -1781,29 +1846,64 @@ function upgrade_feedbacks($start)
 			{
 				if(!$total_rows_set)
 				{
-					$pn_Sessions->set('total_rows', intval($row['total_rows']));
+					$cache->store('total_rows', intval($row['total_rows']));
 					unset($row['total_rows']);
 					$total_rows_set = true;
 				}
-				$insert_query[] = array($row['fid'],$row['sender_name'],$row['sender_email'],$row['subject'],$row['message'],$row['responsibility'],$row['replays'],_NOWTIME);
+				$insert_query[] = array($row['fid'],$row['sender_name'],$row['sender_email'],$row['subject'],$row['message'],$row['responsibility'],$row['replys'],_NOWTIME);
 			}
 
 		$db->query("set names '$pn_dbcharset'");
 		if(isset($insert_query) && !empty($insert_query))
-			$db->table(FEEDBACKS_TABLE)->multiinsert(array("fid","sender_name","sender_email","subject","message","responsibility","replays","added_time"),$insert_query);
+			$db->table(FEEDBACKS_TABLE)->multiinsert(array("fid","sender_name","sender_email","subject","message","responsibility","replys","added_time"),$insert_query);
+	}
+		
+	$errors = $db->getErrors('last');
+	if(isset($errors['message']) && ($errors['message'] == "MySQL server has gone away" || stristr($errors['message'], "max_allowed_packet")))
+	{
+		upgrade_header(7, 95);
+		echo"
+		<form role=\"form\" class=\"form-horizontal\" id=\"nukeform\" action=\"install.php?op=feedbacks".((isset($start) && $start != 0) ? "&start=$start":"")."\" method=\"post\">
+			<div class=\"wizard-card-container\" style=\"height: 326px;\">
+				<div class=\"wizard-card\" data-cardname=\"group\">
+					<h3>بروزرسانی سیستم</h3>
+					<div class=\"wizard-error\">
+						<div class=\"alert alert-danger\">	<strong>خطا :</strong> حجم اطلاعات شما بالا می باشد و سرور قادر به انتقال تعداد $transfer_counter پیام در هر بار نمی باشد. لطفاً تعداد انتقال را با توجه به حجم پیامهایتان پایین بیاورید. .</div>
+					</div>
+					<div class=\"wizard-input-section\">
+						<div class=\"form-group\">
+							<label class=\"control-label col-sm-4\" for=\"transfer_counter\">تعداد پیام قابل انتقال:</label>
+							<div class=\"col-sm-8\">
+								<input type=\"text\" class=\"form-control\" id=\"transfer_counter\" name=\"transfer_counter\" value=\"$transfer_counter\" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class=\"wizard-footer\">
+				<div class=\"wizard-buttons-container\">
+					<div class=\"btn-group-single pull-left\">
+						<a href=\"javascript:history.go(-1)\"><button class=\"btn wizard-back\" type=\"button\">قبلی</button></a>
+						<input class=\"btn wizard-next btn-primary\" type=\"submit\" value=\"بعدی\" />
+					</div>
+				</div>
+			</div>
+		</form>";
+		upgrade_footer();
+		die();
 	}
 	
-	$new_start = $start+500;
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$new_start = $start+$transfer_counter;
+	$total_rows = $cache->retrieve('total_rows');
 	
-	upgrade_progress_output("انتقال پیامهای ارتباط با ما", $total_rows, $fetched_rows, $start, "install.php?op=ipbans", "install.php?op=feedbacks&start=$new_start", 30, 500);
+	upgrade_progress_output("انتقال پیامهای ارتباط با ما", $total_rows, $fetched_rows, $start, "install.php?op=ipbans", "install.php?op=feedbacks&start=$new_start", 30, $transfer_counter);
 }
 /*
 function upgrade_mtsn($start)
 {
-	global $db, $nuke_configs, $pn_Sessions, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $pn_dbcharset;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -1832,7 +1932,7 @@ function upgrade_mtsn($start)
 		{
 			if(!$total_rows_set)
 			{
-				$pn_Sessions->set('total_rows', intval($row['total_rows']));
+				$cache->store('total_rows', intval($row['total_rows']));
 				unset($row['total_rows']);
 				$total_rows_set = true;
 			}
@@ -1845,16 +1945,16 @@ function upgrade_mtsn($start)
 	}
 	
 	$new_start = $start+2000;
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$total_rows = $cache->retrieve('total_rows');
 	
 	upgrade_progress_output("انتقال اطلاعات حملات سایت", $total_rows, $fetched_rows, $start, "install.php?op=ipbans", "install.php?op=mtsn&start=$new_start", 32, 2000);
 }
 */
 function upgrade_ipbans($start)
 {
-	global $db, $nuke_configs, $pn_Sessions, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $pn_dbcharset;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -1883,7 +1983,7 @@ function upgrade_ipbans($start)
 		{
 			if(!$total_rows_set)
 			{
-				$pn_Sessions->set('total_rows', intval($row['total_rows']));
+				$cache->store('total_rows', intval($row['total_rows']));
 				unset($row['total_rows']);
 				$total_rows_set = true;
 			}
@@ -1895,16 +1995,16 @@ function upgrade_ipbans($start)
 	}
 	
 	$new_start = $start+2000;
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$total_rows = $cache->retrieve('total_rows');
 	
 	upgrade_progress_output("انتقال آی پی های مسدود شده", $total_rows, $fetched_rows, $start, "install.php?op=reports", "install.php?op=ipbans&start=$new_start", 40, 2000);
 }
 
 function upgrade_reports($start)
 {
-	global $db, $nuke_configs, $pn_Sessions, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $pn_dbcharset;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -1934,7 +2034,7 @@ function upgrade_reports($start)
 		{
 			if(!$total_rows_set)
 			{
-				$pn_Sessions->set('total_rows', intval($row['total_rows']));
+				$cache->store('total_rows', intval($row['total_rows']));
 				unset($row['total_rows']);
 				$total_rows_set = true;
 			}
@@ -1947,16 +2047,16 @@ function upgrade_reports($start)
 	}
 	
 	$new_start = $start+500;
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$total_rows = $cache->retrieve('total_rows');
 	
 	upgrade_progress_output("انتقال گزارشات", $total_rows, $fetched_rows, $start, "install.php?op=scores", "install.php?op=reports&start=$new_start", 48, 500);
 }
 
 function upgrade_scores($start)
 {
-	global $db, $nuke_configs, $pn_Sessions, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $pn_dbcharset;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -1985,7 +2085,7 @@ function upgrade_scores($start)
 		{
 			if(!$total_rows_set)
 			{
-				$pn_Sessions->set('total_rows', intval($row['total_rows']));
+				$cache->store('total_rows', intval($row['total_rows']));
 				unset($row['total_rows']);
 				$total_rows_set = true;
 			}
@@ -1997,16 +2097,16 @@ function upgrade_scores($start)
 	}
 
 	$new_start = $start+1000;
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$total_rows = $cache->retrieve('total_rows');
 	
 	upgrade_progress_output("انتقال امتیازات اخبار", $total_rows, $fetched_rows, $start, "install.php?op=statistics", "install.php?op=scores&start=$new_start", 56, 1000);
 }
 
 function upgrade_statistics($start = 0)
 {
-	global $db, $nuke_configs, $pn_Sessions, $counter, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $counter, $pn_dbcharset;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -2054,7 +2154,7 @@ function upgrade_statistics($start = 0)
 		$result1 = $db->query("SELECT shid FROM `nuke_stats_hour` ORDER BY shid DESC LIMIT 0,1");
 		$results1 = $result1->results();
 		$total_rows = $results1[0]['shid'];
-		$pn_Sessions->set('total_rows', intval($total_rows));
+		$cache->store('total_rows', intval($total_rows));
 	}
 	
 	$result = $db->query("SELECT shid, g_year, g_month, g_date, g_hour, g_hits FROM `nuke_stats_hour` WHERE shid > '$start' ORDER BY shid ASC LIMIT 0,5000");
@@ -2130,16 +2230,16 @@ function upgrade_statistics($start = 0)
 	if($fetched_rows == 0 || ($fetched_rows > 0 && $fetched_rows < 5000 && $start != 0))
 		$db->query("DROP TABLE IF EXISTS `nuke_stats_hour`;");
 	
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$total_rows = $cache->retrieve('total_rows');
 	
 	upgrade_progress_output("انتقال آمار سایت", $total_rows, $fetched_rows, $start, "install.php?op=tags", "install.php?op=statistics&start=$new_start", 64, 5000);
 }
 
 function upgrade_tags($start)
 {
-	global $db, $nuke_configs, $pn_Sessions, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $pn_dbcharset;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -2169,7 +2269,7 @@ function upgrade_tags($start)
 		{
 			if(!$total_rows_set)
 			{
-				$pn_Sessions->set('total_rows', intval($row['total_rows']));
+				$cache->store('total_rows', intval($row['total_rows']));
 				unset($row['total_rows']);
 				$total_rows_set = true;
 			}
@@ -2182,16 +2282,16 @@ function upgrade_tags($start)
 	}
 	
 	$new_start = $start+1000;
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$total_rows = $cache->retrieve('total_rows');
 	
 	upgrade_progress_output("انتقال کلمات کلیدی", $total_rows, $fetched_rows, $start, "install.php?op=articles", "install.php?op=tags&start=$new_start", 72, 1000);
 }
 
 function upgrade_articles($start)
 {
-	global $db, $nuke_configs, $pn_Sessions, $transfer_counter, $pn_dbcharset, $pn_dbname;
+	global $db, $nuke_configs, $cache, $transfer_counter, $pn_dbcharset, $pn_dbname;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -2214,7 +2314,7 @@ function upgrade_articles($start)
 	
 	$default_cols = array("sid","aid","title","time","hometext","bodytext","newslevel","news_group","newsurl","comments","counter","topic","informant","notes","ihome","alanguage","acomm","haspoll","pollID","score","ratings","rating_ip","position","story_pass","topic_link");
 	
-	$stories_cols = $pn_Sessions->get("stories_table_cols", false);
+	$stories_cols = $cache->retrieve("stories_table_cols");
 	
 	if($stories_cols != '')
 		$stories_cols = phpnuke_unserialize($stories_cols);
@@ -2228,7 +2328,7 @@ function upgrade_articles($start)
 			if(!in_array($val['Field'], $default_cols))
 				$stories_cols[$val['Field']] = $val;
 		}
-		$pn_Sessions->set('stories_table_cols', phpnuke_serialize($stories_cols));
+		$cache->store('stories_table_cols', phpnuke_serialize($stories_cols));
 	}
 	
 	$transfer_counter = (isset($transfer_counter) && $transfer_counter != 0) ? $transfer_counter:500;
@@ -2253,7 +2353,7 @@ function upgrade_articles($start)
 			
 				if(!$total_rows_set)
 				{
-					$pn_Sessions->set('total_rows', intval($row['total_rows']));
+					$cache->store('total_rows', intval($row['total_rows']));
 					unset($row['total_rows']);
 					$total_rows_set = true;
 				}
@@ -2289,10 +2389,9 @@ function upgrade_articles($start)
 				$db->table(ARTICLES_TABLE)->multiinsert($new_cols,$insert_query);
 		}
 	}
-	$pn_Sessions->set('last_article_sid', $db->lastInsertid());
 	
 	$errors = $db->getErrors('last');
-	if(isset($errors['message']) && $errors['message'] == "MySQL server has gone away")
+	if(isset($errors['message']) && ($errors['message'] == "MySQL server has gone away" || stristr($errors['message'], "max_allowed_packet")))
 	{
 		upgrade_header(7, 95);
 		echo"
@@ -2325,18 +2424,19 @@ function upgrade_articles($start)
 		upgrade_footer();
 		die();
 	}
+	$cache->store('last_article_sid', $db->lastInsertid());
 	
 	$new_start = $start+$transfer_counter;
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$total_rows = $cache->retrieve('total_rows');
 	
 	upgrade_progress_output("انتقال مطالب", $total_rows, $fetched_rows, $start, "install.php?op=staticpages", "install.php?op=articles&start=$new_start&transfer_counter=$transfer_counter", 80, $transfer_counter);
 }
 
 function upgrade_staticpages($start)
 {
-	global $db, $nuke_configs, $pn_Sessions, $transfer_counter, $pn_dbcharset, $pn_dbname;
+	global $db, $nuke_configs, $cache, $transfer_counter, $pn_dbcharset, $pn_dbname;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -2357,8 +2457,9 @@ function upgrade_staticpages($start)
 	
 	$transfer_counter = (isset($transfer_counter) && $transfer_counter != 0) ? $transfer_counter:500;
 	
-	$last_article_sid = $pn_Sessions->get('last_article_sid', false);
-	$default_admin = $pn_Sessions->get('default_admin', false);
+	$last_article_sid = $cache->retrieve('last_article_sid');
+
+	$default_admin = $cache->retrieve('default_admin', false);
 	
 	$result = $db->query("SELECT *, (SELECT COUNT(pid) FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_staticpages`) as total_rows FROM `".OLD_DB."`.`".OLD_DB_PREFIX."_staticpages` ORDER BY pid ASC LIMIT $start, $transfer_counter");
 	$fetched_rows = intval($result->count());
@@ -2374,15 +2475,16 @@ function upgrade_staticpages($start)
 			{
 				if(!$total_rows_set)
 				{
-					$pn_Sessions->set('total_rows', intval($row['total_rows']));
+					$cache->store('total_rows', intval($row['total_rows']));
 					unset($row['total_rows']);
 					$total_rows_set = true;
 				}
 				
-				$row['pid'] = $last_article_sid+1;
+				$last_article_sid++;
+				$row['pid'] = $last_article_sid;
 				
 				$article_url = trim(sanitize(str2url($row['title'])), "-");
-				$article_url = get_unique_post_slug(ARTICLES_TABLE, "pid", $row['pid'], "article_url", $article_url, 'publish');
+				$article_url = get_unique_post_slug(ARTICLES_TABLE, "sid", $row['pid'], "article_url", $article_url, 'publish');
 				if($row['notes'] != '') 
 					$row['notes'] = str_replace(":", ",", $row['notes']);
 				$row['comments'] = ($row['comments'] < 0) ? 0:$row['comments'];
@@ -2404,7 +2506,7 @@ function upgrade_staticpages($start)
 	}
 	
 	$errors = $db->getErrors('last');
-	if(isset($errors['message']) && $errors['message'] == "MySQL server has gone away")
+	if(isset($errors['message']) && ($errors['message'] == "MySQL server has gone away" || stristr($errors['message'], "max_allowed_packet")))
 	{
 		upgrade_header(7, 95);
 		echo"
@@ -2438,17 +2540,18 @@ function upgrade_staticpages($start)
 		die();
 	}
 	
+	$cache->store('last_article_sid', $db->lastInsertid());
 	$new_start = $start+$transfer_counter;
-	$total_rows = $pn_Sessions->get('total_rows', false);
+	$total_rows = $cache->retrieve('total_rows');
 	
 	upgrade_progress_output("انتقال صفحات ثابت", $total_rows, $fetched_rows, $start, "install.php?op=forum", "install.php?op=staticpages&start=$new_start&transfer_counter=$transfer_counter", 80, $transfer_counter);
 }
 
 function upgrade_forum()
 {
-	global $db, $nuke_configs, $pn_Sessions, $pn_dbtype, $pn_dbfetch, $pn_dbcharset;
+	global $db, $nuke_configs, $cache, $pn_dbtype, $pn_dbfetch, $pn_dbcharset;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -2463,7 +2566,7 @@ function upgrade_forum()
 		die();
 	}
 	
-	$install_options = $pn_Sessions->get('install_options', false);
+	$install_options = $cache->retrieve('install_options');
 	$install_options = phpnuke_unserialize($install_options);
 	
 	// Get a listing of all tables
@@ -2514,6 +2617,39 @@ function upgrade_forum()
 		
 		$db->query("set names '$pn_dbcharset'");
 		$db->query("INSERT INTO $new_users_table_name SELECT * FROM $old_users_table_name");
+		
+		if(isset($install_options['db_info']['db_have_forum']) && $install_options['db_info']['db_have_forum'] != 0)
+		{
+		$config_data = "<?php
+// phpBB 3.0.x auto-generated configuration file
+// Do not change anything in this file!
+".'$'."dbms = 'mysqli';
+".'$'."dbhost = 'localhost';
+".'$'."dbport = '';
+".'$'."dbname = '".$install_options['db_info']['db_forumname']."';
+".'$'."dbuser = '".$install_options['db_info']['db_username']."';
+".'$'."dbpasswd = '".$install_options['db_info']['db_password']."';
+".'$'."table_prefix = '".$install_options['db_info']['db_forumprefix']."_';
+".'$'."phpbb_adm_relative_path = 'adm/';
+".'$'."acm_type = 'phpbb\\cache\\driver\\file';
+
+@define('PHPBB_INSTALLED', true);
+// @define('PHPBB_DISPLAY_LOAD_TIME', true);
+@define('PHPBB_ENVIRONMENT', 'production');
+// @define('DEBUG_CONTAINER', true);
+
+".'$'."queryString = ".'$'."_SERVER['QUERY_STRING'];
+if ((stristr(".'$'."queryString,'%20union%20')) OR (stristr(".'$'."queryString,'%2f%2a')) OR (stristr(".'$'."queryString,'%2f*')) OR (stristr(".'$'."queryString,'/*')) OR (stristr(".'$'."queryString,'*/union/*')) OR (stristr(".'$'."queryString,'c2nyaxb0')) OR (stristr(".'$'."queryString,'+union+'))  OR ((stristr(".'$'."queryString,'cmd=')) AND (!stristr(".'$'."queryString,'&cmd'))) OR ((stristr(".'$'."queryString,'exec')) AND (!stristr(".'$'."queryString,'execu'))) OR (stristr(".'$'."queryString,'concat'))) {
+die('Illegal Operation');
+}
+?>";
+		if(isset($install_options['db_info']['db_forumpath']) && $install_options['db_info']['db_forumpath'] != '' && file_exists($install_options['db_info']['db_forumpath']."/config.php"))
+		{
+			$fp = fopen($install_options['db_info']['db_forumpath']."/config.php", 'w');
+			fputs($fp, $config_data);
+			fclose($fp);
+		}
+		}
 	}
 	
 	upgrade_progress_output("انتقال جداول تالار", 100, 100, 0, "install.php?op=final", "", 90, 1000);
@@ -2521,9 +2657,9 @@ function upgrade_forum()
 
 function upgrade_final()
 {
-	global $db, $nuke_configs, $pn_Sessions, $cache, $Req_URL;
+	global $db, $nuke_configs, $cache, $Req_URL, $visitor_ip;
 	
-	if(!$pn_Sessions->exists('install_options'))
+	if(!$cache->isCached('install_options'))
 	{
 		upgrade_header(7, 95);
 		echo"<div class=\"wizard-card-container\" style=\"height: 326px;\">
@@ -2538,7 +2674,7 @@ function upgrade_final()
 		die();
 	}
 		
-	$install_options = $pn_Sessions->get("install_options", false);
+	$install_options = $cache->retrieve("install_options");
 	$install_options = phpnuke_unserialize($install_options);
 	
 	$install_options['siteinfo']['nukeurl'] = (isset($install_options['db_info']['nukeurl'])) ? $install_options['db_info']['nukeurl']:$Req_URL;
@@ -2548,7 +2684,7 @@ function upgrade_final()
 	$install_options['db_info']['db_forumname'] = (isset($install_options['db_info']['db_forumname'])) ? $install_options['db_info']['db_forumname']:"";
 	$install_options['db_info']['db_forumpath'] = (isset($install_options['db_info']['db_forumpath'])) ? $install_options['db_info']['db_forumpath']:"";
 		
-	$db->query("UPDATE ".CONFIG_TABLE." SET config_value = '8.4.0' WHERE config_name = 'Version_Num'");
+	$db->query("UPDATE ".CONFIG_TABLE." SET config_value = '8.4.1' WHERE config_name = 'Version_Num'");
 	$db->query("UPDATE ".CONFIG_TABLE." SET config_value = '".$install_options['siteinfo']['nukeurl']."' WHERE config_name = 'nukeurl'");
 	$db->query("UPDATE ".CONFIG_TABLE." SET config_value = '".$install_options['siteinfo']['sitename']."' WHERE config_name = 'sitename'");
 	$db->query("UPDATE ".CONFIG_TABLE." SET config_value = '".$install_options['db_info']['db_forumcms']."' WHERE config_name = 'forum_system'");
@@ -2559,7 +2695,6 @@ function upgrade_final()
 	
 	$db->query("UPDATE ".CONFIG_TABLE." SET config_value = '".$install_options['db_info']['db_have_forum']."' WHERE config_name = 'have_forum'");
 	
-	
 	if(isset($install_options['db_info']['nukeurl']))
 		$db->query("UPDATE ".CONFIG_TABLE." SET config_value = '1' WHERE config_name = 'lock_siteurl'");
 		
@@ -2568,13 +2703,192 @@ function upgrade_final()
 	
 	if($install_options['mode'] == 'install')
 	{
+		// add new admin
 		$db->table(AUTHORS_TABLE)
 			->insert(array(
 				'aid' => $install_options['admininfo']['aid'],
 				'name' => 'God',
 				'email' => $install_options['admininfo']['email'],
 				'pwd' => $pwd,
+				'counter' => 1,
 				'realname' => $install_options['admininfo']['realname'],
+			));
+		
+		// add new article
+		$db->table(ARTICLES_TABLE)
+			->insert(array(
+				'status' => 'publish',
+				'post_type' => 'article',
+				'aid' => $install_options['admininfo']['aid'],
+				'title' => 'مطلب ابتدایی',
+				'time' => _NOWTIME,
+				'ip' => $visitor_ip,
+				'hometext' => addslashes('<p align="justify">آیا تا به حال به این فکر افتاده اید که برای خود یک وب سایت در دنیای اینترنت داشته باشید یا اینکه برای معرفی شرکت یا محصول خود از طریق اینترنت یک سایت اختصاصی ایجاد کنید.</p>\r\n<p>مشهدتیم آمادگی خود را برای ارائه سرویس های هاستینگ و ثبت دامنه با مناسب ترین قیمت و بهترین امکانات اعلام میکند . سرویس هاستینگ مشهدتیم با کادر مجرب بصورت 24 ساعته پاسخگوی شما خواهد بود . پس از اجاره فضا اگر شما تمایل به استفاده از نسخه های مختلف php-nuke فارسی را دارید گروه مشهدتیم این سیستم مدیریت محتوا را برای شما بصورت رایگان نصب و تنظیم مینماید ، برای کسب اطلاعات بیشتر به بخش <a href="http://www.phpnuke.ir/index.php?modname=hosting&amp;op=register">میزبانی وب</a> مراجعه فرمائید.</p>\r\n'),
+				'article_url' => 'مطلب-ابتدایی',
+				'ihome' => 1,
+				'allow_comment' => 1,
+				'cat_link' => 1,
+				'cat_link' => '0',
+				'permissions' => '0',
+				'position' => 1,
+			));
+		
+		// add new blocks
+		$default_blocks = array(
+			array(1, 'Articles tags', 'block-Articles_tags.php'),
+			array(2, 'Languages', 'block-Languages.php'),
+			array(3, 'Last 5 Articles', 'block-Last_5_Articles.php'),
+			array(4, 'MT-Forums', 'block-MT-Forums.php'),
+			array(5, 'MT-ForumsTabed', 'block-MT-ForumsTabed.php'),
+			array(6, 'Search', 'block-Search.php'),
+			array(7, 'User Info', 'block-User_Info.php'),
+			array(8, 'archive', 'block-archive.php'),
+			array(9, 'comments', 'block-comments.php'),
+			array(10, 'surveys', 'block-surveys.php'),
+			array(11, 'Last comments', 'block-Last_comments.php')
+		);
+		
+		$db->table(BLOCKS_TABLE)
+			->multiinsert(array('bid','title','blockfile'), $default_blocks);			
+		
+		$left_blocks_data = array(
+			'7' => array(
+				'title' => 'User Info',
+				'lang_titles' => '',
+				'blanguage' => '',
+				'weight' => 1,
+				'active' => 1,
+				'time' => _NOWTIME,
+				'permissions' => 0,
+				'publish' => 0,
+				'expire' => 0,
+				'action' => '',
+				'theme_block' => ''
+			)
+		);
+
+		$right_blocks_data = array(
+			'3' => array(
+				'title' => 'Last 5 Articles',
+				'lang_titles' => '',
+				'blanguage' => '',
+				'weight' => 1,
+				'active' => 1,
+				'time' => _NOWTIME,
+				'permissions' => 0,
+				'publish' => 0,
+				'expire' => 0,
+				'action' => '',
+				'theme_block' => ''
+			),
+			'6' => array(
+				'title' => 'Search',
+				'lang_titles' => '',
+				'blanguage' => '',
+				'weight' => 2,
+				'active' => 1,
+				'time' => _NOWTIME,
+				'permissions' => 0,
+				'publish' => 0,
+				'expire' => 0,
+				'action' => '',
+				'theme_block' => ''
+			),
+			'10' => array(
+				'title' => 'surveys',
+				'lang_titles' => '',
+				'blanguage' => '',
+				'weight' => 3,
+				'active' => 1,
+				'time' => _NOWTIME,
+				'permissions' => 0,
+				'publish' => 0,
+				'expire' => 0,
+				'action' => '',
+				'theme_block' => ''
+			),
+			'8' => array(
+				'title' => 'archive',
+				'lang_titles' => '',
+				'blanguage' => '',
+				'weight' => 4,
+				'active' => 1,
+				'time' => _NOWTIME,
+				'permissions' => 0,
+				'publish' => 0,
+				'expire' => 0,
+				'action' => '',
+				'theme_block' => ''
+			)
+		);
+		
+		$topcenter_blocks_data = array(
+			'5' => array(
+				'title' => 'MT-ForumsTabed',
+				'lang_titles' => '',
+				'blanguage' => '',
+				'weight' => 1,
+				'active' => 1,
+				'time' => _NOWTIME,
+				'permissions' => 0,
+				'publish' => 0,
+				'expire' => 0,
+				'action' => '',
+				'theme_block' => ''
+			)
+		);
+		
+		$left_blocks_data = addslashes(phpnuke_serialize($left_blocks_data));
+		$right_blocks_data = addslashes(phpnuke_serialize($right_blocks_data));
+		$topcenter_blocks_data = addslashes(phpnuke_serialize($topcenter_blocks_data));
+		
+		$db->table(BLOCKS_BOXES_TABLE)
+			->where("box_id" , 'left')
+			->update(array(
+				'box_blocks' => '7',
+				'box_blocks_data' => $left_blocks_data,
+			));
+			
+		$db->table(BLOCKS_BOXES_TABLE)
+			->where("box_id" , 'right')
+			->update(array(
+				'box_blocks' => '3,6,10,8',
+				'box_blocks_data' => $right_blocks_data,
+			));
+		if($install_options['db_info']['db_have_forum'] == 1)
+		{
+			$db->table(BLOCKS_BOXES_TABLE)
+				->where("box_id" , 'topcenter')
+				->update(array(
+					'box_blocks' => '5',
+					'box_blocks_data' => $topcenter_blocks_data,
+				));
+		}	
+		// add new uncategorized
+		
+		$default_cat = array(
+			array(1,1,'Articles','uncategorized','a:2:{s:7:\"english\";s:13:\"uncategorized\";s:5:\"farsi\";s:19:\"بدون موضوع\";}')
+		);
+		$db->table(CATEGORIES_TABLE)
+			->multiinsert(array('catid','type','module','catname','cattext'),$default_cat);
+			
+		// add new poll
+		$db->table(SURVEYS_TABLE)
+			->insert(array(
+				'pollID' => 1,
+				'status' => 1,
+				'aid' => $install_options['admininfo']['aid'],
+				'canVote' => 1,
+				'to_main' => 1,
+				'multi_vote' => 0,
+				'show_voters_num' => 0,
+				'permissions' => "0",
+				'allow_comment' => 1,
+				'main_survey' => 1,
+				'pollTitle' => 'نظر شما در مورد این سایت ؟',
+				'pollUrl' => 'نظر-شما-در-مورد-این-سایت',
+				'start_time' => _NOWTIME,
+				'options' => 'a:4:{i:0;a:2:{i:0;s:8:\"عالی\";i:1;i:0;}i:1;a:2:{i:0;s:8:\"خوبی\";i:1;i:0;}i:2;a:2:{i:0;s:10:\"متوسط\";i:1;i:0;}i:3;a:2:{i:0;s:8:\"ضعیف\";i:1;i:0;}}',
 			));
 	}
 	else
@@ -2585,18 +2899,26 @@ function upgrade_final()
 				'pwd' => $pwd,
 			));
 	}
+			
+	// add new nav menu data	
+	$nav_menus_data = array(
+		array(1, 1, 1, 0, 1, 'صفحه اصلی', 'index.html', 'a:4:{s:6:\"target\";s:0:\"\";s:3:\"xfn\";s:0:\"\";s:7:\"classes\";s:0:\"\";s:6:\"styles\";s:0:\"\";}', 'custom', '', 0),
+		array(2, 1, 1, 0, 2, 'تماس با ما', 'index.php?modname=Feedback', 'a:4:{s:6:\"target\";s:0:\"\";s:3:\"xfn\";s:0:\"\";s:7:\"classes\";s:0:\"\";s:6:\"styles\";s:0:\"\";}', 'custom', '', 0),
+		array(3, 1, 1, 0, 3, 'تالار گفتمان', 'Forum', 'a:4:{s:6:\"target\";s:0:\"\";s:3:\"xfn\";s:0:\"\";s:7:\"classes\";s:0:\"\";s:6:\"styles\";s:0:\"\";}', 'custom', '', 0),
+		array(4, 1, 1, 0, 4, 'جستجو', 'index.php?modname=Search', 'a:4:{s:6:\"target\";s:0:\"\";s:3:\"xfn\";s:0:\"\";s:7:\"classes\";s:0:\"\";s:6:\"styles\";s:0:\"\";}', 'custom', '', 0)
+	);
 	
+	$db->table(NAV_MENUS_DATA_TABLE)
+		->multiinsert(array('nid','status','nav_id','pid','weight','title','url','attributes','type','module','part_id'),$nav_menus_data);
+		
 	$rename_error = '';
 	if(!rename("install","install".rand(1,1000)) || !rename("install.php","install".rand(2000,9999).".php.back"))
 	{
 		$rename_error = "<br />فایل و پوشه install قابل تغییر نام نیستند. لطفاً ابتدا این فایل و پوشه را حذف یا تغییر نام دهید و سپس به بخشهای دیگر بروید";
-	}
-	
+	}	
 	
 	upgrade_progress_output("تکمیل ".(($install_options['mode'] == 'install') ? "نصب":"بروزرسانی").$rename_error, 1, 1, 0, "", "", 100, 1000);
 	
-	$pn_Sessions->destroy();
-	unset($_SESSION);
 	$cache->flush_caches();
 	cache_system('all');
 	die();

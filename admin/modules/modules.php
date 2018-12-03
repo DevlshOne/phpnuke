@@ -357,8 +357,10 @@ if (check_admin_permission($filename))
 			->first(['title', 'active']);
 		
 		$active = intval($active);
-		$result['active'] = $active;
-		$result->save();
+		
+		$result = $db->table(MODULES_TABLE)
+			->where('mid', $mid)
+			->update(['active' => $active]);
 		
 		cache_system('nuke_modules');
 		add_log(sprintf(_ACTIVATEMODULELOG, (($active == 1) ? _ACTIVATE:_DEACTIVATE), $result['title']), 1);
@@ -545,7 +547,7 @@ if (check_admin_permission($filename))
 			->first();
 		
 		$all_module_boxes = $modules_row['module_boxes'];
-		$all_module_boxes = phpnuke_unserialize(stripslashes($all_module_boxes));
+		$all_module_boxes = ($modules_row['module_boxes'] != '') ? phpnuke_unserialize(stripslashes($all_module_boxes)):array();
 		$module_file = (isset($module_file) && $module_file != '') ? $module_file:"index";
 
 		if(isset($submit) && $submit != '' && isset($module_boxes) && $module_boxes != '')

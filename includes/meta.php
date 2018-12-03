@@ -23,9 +23,13 @@ if(!defined('NUKE_FILE'))
 global $db, $nuke_configs, $nuke_lang_cachedata, $nuke_rss_codes, $category;
 
 $pagetitle = $nuke_configs['sitename'].((!defined("HOME_FILE")) ? " - ".((isset($meta_tags['title'])) ? strip_tags($meta_tags['title']):''):"");
-$description = (isset($meta_tags['description'])) ? $meta_tags['description']:$nuke_configs['site_description'];
-$keywords = (isset($meta_tags['keywords'])) ? $meta_tags['keywords']:$nuke_configs['site_keywords'];
-$extra_meta_tags = (isset($meta_tags['extra_meta_tags'])) ? $meta_tags['extra_meta_tags']:array();
+$description = (isset($meta_tags['description']) && $meta_tags['description'] != '') ? stripslashes(strip_tags($meta_tags['description'])):stripslashes($nuke_configs['site_description']);
+$keywords = (isset($meta_tags['keywords']) && $meta_tags['keywords'] != '') ? $meta_tags['keywords']:$nuke_configs['site_keywords'];
+$meta_type = (isset($meta_tags['meta_type']) && $meta_tags['meta_type'] != '') ? $meta_tags['meta_type']:'website';
+$meta_image = (isset($meta_tags['meta_image'])) ? $meta_tags['meta_image']:$nuke_configs['nukeurl'].'images/logo_meta.png';
+$meta_video = (isset($meta_tags['meta_video'])) ? $meta_tags['meta_video']:'';
+$meta_audio = (isset($meta_tags['meta_audio'])) ? $meta_tags['meta_audio']:'';
+$extra_meta_tags = (isset($meta_tags['extra_meta_tags']) && !empty($meta_tags['extra_meta_tags'])) ? $meta_tags['extra_meta_tags']:array();
 $description = str_replace(array("\n","\r"),"", $description);
 
 $contents .= "
@@ -36,23 +40,28 @@ $contents .= "
 	$contents .= "	<meta name=\"description\" content=\"$description\">";
 
 	if (file_exists("themes/".$nuke_configs['ThemeSel']."/images/favicon.ico"))
-		$contents .= "	<link rel=\"shortcut icon\" href=\"".$nuke_configs['nukeurl']."/themes/".$nuke_configs['ThemeSel']."/images/favicon.ico\" type=\"image/x-icon\" />\n";
+		$contents .= "	<link rel=\"shortcut icon\" href=\"".$nuke_configs['nukeurl']."/themes/".$nuke_configs['ThemeSel']."/images/favicon.ico\" type=\"image/x-icon\" />";
 		
 	if(isset($meta_tags['prev']) && $meta_tags['prev'] != '')
-		$contents .= "	<link rel=\"prev\" href=\"".$meta_tags['prev']."\" />\n";
+		$contents .= "\n	<link rel=\"prev\" href=\"".$meta_tags['prev']."\" />";
 		
 	if(isset($meta_tags['next']) && $meta_tags['next'] != '')
-		$contents .= "	<link rel=\"next\" href=\"".$meta_tags['next']."\" />\n";
+		$contents .= "\n	<link rel=\"next\" href=\"".$meta_tags['next']."\" />";
 		
 	if(isset($nuke_configs['site_meta_tags']) && $nuke_configs['site_meta_tags'] != '')
-		$contents .= $nuke_configs['site_meta_tags']."\n";
-
-	$contents .= "		<meta property=\"og:locale\" content=\"".$nuke_configs['locale']."\" />
-		<meta property=\"og:type\" content=\"website\" />
-		<meta property=\"og:title\" content=\"".$pagetitle."\" />
-		<meta property=\"og:url\" content=\"".LinkToGT($meta_tags['url'])."\" />
-		<meta property=\"og:site_name\" content=\"".$nuke_configs['sitename']."\" />";
-
+	{
+		$nuke_configs['site_meta_tags'] = stripslashes($nuke_configs['site_meta_tags']);
+		$nuke_configs['site_meta_tags'] = str_replace(
+			array(
+				"{TITLE}", "{SITENAME}", "{URL}", "{PAGETITLE}", "{LOCALE}", "{DESCRIPTION}", "{IMAGE}", "{VIDEO}", "{AUDIO}", "{TYPE}"
+			),
+			array(
+				$pagetitle, $nuke_configs['sitename'], LinkToGT($meta_tags['url']), $pagetitle, $nuke_configs['locale'], $description, $meta_image, $meta_video, $meta_audio, $meta_type
+			),
+			$nuke_configs['site_meta_tags']
+		);
+		$contents .= "\n".stripslashes($nuke_configs['site_meta_tags'])."";
+	}
 	if ($nuke_configs['gverify'] != ""._YOUR_CODE."" && $nuke_configs['gverify'] != "")
 		$contents .= "	<meta name=\"google-site-verification\" content=\"".$nuke_configs['gverify']."\" />\n";
 

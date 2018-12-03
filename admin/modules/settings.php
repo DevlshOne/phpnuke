@@ -64,6 +64,7 @@ if (check_admin_permission($filename))
                 <li><a href=\"".$admin_file.".php?op=mailing_config\"><span>"._MAILING."</span></a></li>";
 				if(is_God()) $contents .="<li><a href=\"".$admin_file.".php?op=uploads_config\"><span>"._FILE_UPLOAD."</span></a></li>";
 				$contents .="<li><a href=\"".$admin_file.".php?op=forums_config\"><span>"._FORUMS_AND_USERS_SYSTEM."</span></a></li>
+				<li><a href=\"".$admin_file.".php?op=smilies_config\"><span>"._SMILIES."</span></a></li>
 				<li><a href=\"".$admin_file.".php?op=others_config\"><span>"._OTHERS."</span></a></li>";
 				if(isset($other_admin_configs) && is_array($other_admin_configs) && !empty($other_admin_configs))
 				{
@@ -343,16 +344,31 @@ if (check_admin_permission($filename))
 		$contents .= "<input type='checkbox' class='styled' name='config_fields[comments][inputs][name_act]' value='1' data-label=\""._ACTIVE."/"._INACTIVE."\" $checked1> &nbsp;&nbsp;&nbsp;<input type='checkbox' class='styled' name='config_fields[comments][inputs][name_req]' value='1' data-label=\""._REQUIRED."/"._NOT_REQUIRED."\" $checked2>";
 		$contents .= "</td></tr>
 		
+		<tr><th>"._COMMENTS_NAME_CHANGE."</th><td>";
+		$checked = (isset($comments_configs['inputs']['name_enter']) && $comments_configs['inputs']['name_enter'] == 1) ? "checked":"";
+		$contents .= "<input type='checkbox' class='styled' name='config_fields[comments][inputs][name_enter]' value='1' data-label=\""._ACTIVE."/"._INACTIVE."\" $checked>";
+		$contents .= "</td></tr>
+		
 		<tr><th>"._COMMENTS_EMAIL_REQUIRED."</th><td>";
 		$checked1 = (isset($comments_configs['inputs']['email_act']) && $comments_configs['inputs']['email_act'] == 1) ? "checked":"";
 		$checked2 = (isset($comments_configs['inputs']['email_req']) && $comments_configs['inputs']['email_req'] == 1) ? "checked":"";
 		$contents .= "<input type='checkbox' class='styled' name='config_fields[comments][inputs][email_act]' value='1' data-label=\""._ACTIVE."/"._INACTIVE."\" $checked1> &nbsp;<input type='checkbox' class='styled' name='config_fields[comments][inputs][email_req]' value='1' data-label=\""._REQUIRED."/"._NOT_REQUIRED."\" $checked2>";
 		$contents .= "</td></tr>
 		
+		<tr><th>"._COMMENTS_EMAIL_CHANGE."</th><td>";
+		$checked = (isset($comments_configs['inputs']['email_enter']) && $comments_configs['inputs']['email_enter'] == 1) ? "checked":"";
+		$contents .= "<input type='checkbox' class='styled' name='config_fields[comments][inputs][email_enter]' value='1' data-label=\""._ACTIVE."/"._INACTIVE."\" $checked>";
+		$contents .= "</td></tr>
+		
 		<tr><th>"._COMMENTS_WEBSITE_REQUIRED."</th><td>";
 		$checked1 = (isset($comments_configs['inputs']['url_act']) && $comments_configs['inputs']['url_act'] == 1) ? "checked":"";
 		$checked2 = (isset($comments_configs['inputs']['url_req']) && $comments_configs['inputs']['url_req'] == 1) ? "checked":"";
 		$contents .= "<input type='checkbox' class='styled' name='config_fields[comments][inputs][url_act]' value='1' data-label=\""._ACTIVE."/"._INACTIVE."\" $checked1> &nbsp;<input type='checkbox' class='styled' name='config_fields[comments][inputs][url_req]' value='1' data-label=\""._REQUIRED."/"._NOT_REQUIRED."\" $checked2>";
+		$contents .= "</td></tr>
+		
+		<tr><th>"._COMMENTS_WEBSITE_CHANGE."</th><td>";
+		$checked = (isset($comments_configs['inputs']['url_enter']) && $comments_configs['inputs']['url_enter'] == 1) ? "checked":"";
+		$contents .= "<input type='checkbox' class='styled' name='config_fields[comments][inputs][url_enter]' value='1' data-label=\""._ACTIVE."/"._INACTIVE."\" $checked>";
 		$contents .= "</td></tr>
 		
 		<tr><th>"._ADMIN_NOTIFY_METHOD_COMMENTS."</th><td>";
@@ -623,7 +639,9 @@ if (check_admin_permission($filename))
 		$checked2 = ($nuke_configs['forum_GTlink_active'] == 0) ? "checked":"";
 		$contents .= "<input type='radio' class='styled' name='config_fields[forum_GTlink_active]' value='1' data-label=\"" . _YES . "\" $checked1> &nbsp; &nbsp;<input type='radio' class='styled' name='config_fields[forum_GTlink_active]' value='0' data-label=\"" . _NO . "\" $checked2>
 		</td></tr>
-		
+		<tr><th>"._LAST_FORUM_IN_BLOCK."</th><td>
+			<input type=\"text\" name='config_fields[forum_last_number]' size=\"40\" class=\"inp-form-ltr\" value=\"".$nuke_configs['forum_last_number']."\">
+		</td></tr>		
 		<tr><th colspan=\"2\" style=\"text-align:center\">"._ADVANCED_FORUM_LINKS."</th></tr>
 		<tr><th>"._POST_URL_ENTRY."</th><td>
 			<input type=\"text\" name='config_fields[forum_seo_post_link]' size=\"40\" class=\"inp-form-ltr\" value=\"".$nuke_configs['forum_seo_post_link']."\">
@@ -778,6 +796,66 @@ if (check_admin_permission($filename))
 		die($contents);
 	}
 	
+	function smilies_config()
+	{
+		global $nuke_configs, $admin_file;
+		$contents = '';
+		$contents .= jquery_codes_load('', true);//reload jquery function is need in jquery yi tabs
+		$nuke_configs['smilies'] = (isset($nuke_configs['smilies'])) ? $nuke_configs['smilies']:"";
+		$smilies_configs = ($nuke_configs['smilies'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['smilies'])):array();
+		$contents .="
+		<div class=\"text-center\"><font class='option'><b>"._SMILIES_SETTINGS."</b></font></div>
+		
+		<form action='".$admin_file.".php' method='post'>
+		<table border=\"0\" align=\"center\" cellpadding=\"3\" class=\"id-form product-table no-border\" width=\"100%\">
+		
+		<tr>
+			"._SMILIES_FIELDS." <span class=\"add_field_icon add_field_button\" title=\""._ADD_NEW_FIELD."\"></span></th>
+			<td>
+				<div class=\"input_fields_wrap\">";
+					$x1 = 1;
+					if(!empty($smilies_configs))
+					{
+						foreach($smilies_configs as $x1 => $smilie_data)
+						{
+							$smilie_data = array_filter($smilie_data);
+							if(empty($smilie_data))
+								continue;
+								
+							$smilie_name = $smilie_data['name'];
+							$option_code = $smilie_data['code'];
+							$option_url = $smilie_data['url'];
+							$option_dimentions = $smilie_data['dimentions'];
+							$option_dimentions_arr = explode("*", $option_dimentions);
+							$width = (isset($option_dimentions_arr[0])) ? $option_dimentions_arr[0]:20;
+							$height = (isset($option_dimentions_arr[1])) ? $option_dimentions_arr[1]:20;
+							$contents .= "
+							<div style=\"margin-bottom:3px;\">
+								<input placeholder=\""._TITLE."\" type=\"text\" class=\"inp-form-ltr\" value=\"$smilie_name\" name=\"config_fields[smilies][$x1][name]\" size=\"20\" />&nbsp;<input placeholder=\""._CODE."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_code\" name=\"config_fields[smilies][$x1][code]\" size=\"20\" />&nbsp;<input placeholder=\""._URL."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_url\" name=\"config_fields[smilies][$x1][url]\" size=\"30\" />&nbsp;<input placeholder=\""._DIMENTIONS."\" type=\"text\" class=\"inp-form-ltr\" value=\"$option_dimentions\" name=\"config_fields[smilies][$x1][dimentions]\" size=\"10\" />&nbsp; &nbsp; <img src=\"".LinkToGT($option_url)."\" width=\"$width\" height=\"$height\" /> <a href=\"#\" class=\"remove_field\">"._REMOVE."</a>
+							</div>";
+						}
+					}
+				$contents .="
+			</td>
+		</tr>
+		<tr><td colspan=\"2\"><input type='hidden' name='op' value='save_configs'>
+		<input class=\"form-submit\" type='submit' name='submit' value='" . _SAVECHANGES . "'></td></tr></table></form>
+		<script>
+			$(document).ready(function(){
+				$(\".input_fields_wrap\").add_field({ 
+					maxField : 1000,
+					addButton: $(\".add_field_button\"),
+					remove_button: '.remove_field',
+					fieldHTML: '<div style=\"margin-bottom:3px;\"><input placeholder=\""._TITLE."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][name]\" size=\"20\" />&nbsp;<input placeholder=\""._CODE."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][code]\" size=\"20\" />&nbsp;<input placeholder=\""._URL."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][url]\" size=\"30\" />&nbsp;<input placeholder=\""._DIMENTIONS."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[smilies][{X}][dimentions]\" size=\"10\" />&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
+					x: $x1,
+				});
+			});
+		</script>		
+		<script src=\"admin/template/js/jquery/jquery.selection.js\" type=\"text/javascript\"></script>
+		";
+		die($contents);
+	}
+	
 	$submit				= (isset($submit))				? filter($submit, "nohtml"):'';
 	$log_message		= (isset($log_message))			? filter($log_message, "nohtml"):'';
 	$return_op			= (isset($return_op))			? filter($return_op, "nohtml"):'settings';
@@ -826,6 +904,10 @@ if (check_admin_permission($filename))
 		
 		case "others_config":
 			others_config($other_admin_config);
+		break;
+		
+		case "smilies_config":
+			smilies_config();
 		break;
 		
 		case "uploads_config":

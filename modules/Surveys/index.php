@@ -41,7 +41,7 @@ function pollList()
 	$contents .= "<ul>";
 	foreach($nuke_surveys_cacheData as $pollID => $nuke_surveys_data)
 	{
-		if ($nuke_surveys_data['status'] != 1 || ($nuke_configs['multilingual'] == 1 && $nuke_configs['currentlang'] != $nuke_surveys_data['planguage'])) continue;
+		if ($nuke_surveys_data['status'] != 1 || ($nuke_configs['multilingual'] == 1 && $nuke_surveys_data['planguage'] != "" && $nuke_configs['currentlang'] != $nuke_surveys_data['planguage'])) continue;
 		
 		$pollTitle = filter($nuke_surveys_data['pollTitle'], "nohtml");
 		$pollUrl = filter($nuke_surveys_data['pollUrl'], "nohtml");
@@ -109,7 +109,7 @@ function poll_show($pollUrl, $mode="")
 	$meta_tags = array(
 		"url" => $poll_data['survey_link'][0],
 		"title" => ""._POLL." : ".$poll_data['pollTitle'],
-		"description" => str_replace(array("\r","\n","\t"), "", strip_tags($poll_data['description'])),
+		"description" => str_replace(array("\r","\n","\t"), "", strip_tags(stripslashes($poll_data['description']))),
 		"extra_meta_tags" => array()
 	);
 	

@@ -68,7 +68,8 @@ class users_system{
 		$this->user_fields['user_group_id']			= "group_id";
 		$this->user_fields['user_regdate']			= "user_regdate";
 		$this->user_fields['user_gender']			= "user_gender";
-		$this->user_fields['user_points']				= "user_points";
+		$this->user_fields['user_points']			= "user_points";
+		$this->user_fields['user_colour']			= "user_colour";
 		
 		// define default topics fileds of phpbb system
 		$this->user_fields['topic_id']				= "topic_id";
@@ -102,18 +103,21 @@ class users_system{
 		
 		$this->user_fields['common_where']			= "user_type != '2' AND user_id > '1'";
 		
-		$this->forum_db				= $nuke_configs['forum_db'];
-		$this->configs_table		= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."config`";
-		$this->users_table			= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."users`";
-		$this->bots_table			= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."bots`";
-		$this->sessions_table		= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."sessions`";
-		$this->sessions_keys_table	= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."sessions_keys`";
-		$this->topics_table			= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."topics`";
-		$this->posts_table			= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."posts`";
-		$this->forums_table			= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."forums`";
-		$this->groups_table			= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."groups`";
-		$this->ranks_table			= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."ranks`";
-		$this->login_attempts_table	= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."login_attempts`";
+		$this->forum_db						= $nuke_configs['forum_db'];
+		$this->configs_table				= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."config`";
+		$this->users_table					= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."users`";
+		$this->user_group					= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."user_group`";
+		$this->user_notifications_table		= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."user_notifications`";
+		$this->profile_fields_data_table	= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."profile_fields_data`";
+		$this->bots_table					= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."bots`";
+		$this->sessions_table				= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."sessions`";
+		$this->sessions_keys_table			= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."sessions_keys`";
+		$this->topics_table					= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."topics`";
+		$this->posts_table					= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."posts`";
+		$this->forums_table					= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."forums`";
+		$this->groups_table					= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."groups`";
+		$this->ranks_table					= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."ranks`";
+		$this->login_attempts_table			= "`".$this->forum_db."`.`".$nuke_configs['forum_prefix']."login_attempts`";
 		
 		$extra_cache_codes = $this->cache_system();
 		
@@ -133,13 +137,14 @@ class users_system{
 		$this->forum_admin_path			= $this->config['script_path']."adm/index.php";
 		$this->session_begin();
 		$this->update_session_infos();
+		$db->query("SET NAMES '".$pn_dbcharset."'");
 	}
 	
 	public function MTForumBlock($p=1)
 	{
 		global $db, $nuke_configs, $pn_dbcharset;
 		$content = '';
-		$Last_New			= 20;
+		$Last_New			= (isset($nuke_configs['forum_last_number']) && intval($nuke_configs['forum_last_number']) > 0) ? $nuke_configs['forum_last_number']:20;
 		$from 				= $Last_New * ($p-1);
 		$db->query("SET NAMES '".$this->collation."'");
 		
@@ -242,6 +247,7 @@ class users_system{
 		
 		$time = (_NOWTIME - (intval($this->config['load_online_time']) * 60));
 
+		$db->query("SET NAMES '".$this->collation."'");
 		//Registered users online
 		$result = $db->query("SELECT DISTINCT 
 		s.session_id, s.session_user_id, s.session_ip, s.session_viewonline, s.session_page,
@@ -267,7 +273,7 @@ class users_system{
 				$online_users['guests_online'] = intval($row['num_guests']);
 				
 				$user_type = intval($row['user_type']);
-				if($user_type == 2) continue;
+				//if($user_type == 2) continue;
 				
 				$session_id = intval($row['session_id']);
 				$session_user_id = intval($row['session_user_id']);
@@ -284,23 +290,37 @@ class users_system{
 					$your_info = $row;
 					
 				$viewer_ip = '';
+				$filtered_ip = '';
 				
 				if($showips == 1)
 				{
 					$viewer_ip_bank = explode('.', $session_ip);
 					for($j=2;$j < count($viewer_ip_bank);$j++)
-						$viewer_ip_bank[$j] = "-";
+						$viewer_ip_bank[$j] = "***";
 						
-					$viewer_ip = implode(".",$viewer_ip_bank);
+					$filtered_ip = implode(".",$viewer_ip_bank);
 					
 					if(is_admin())
-						$viewer_ip = "<a href=\"http://www.ip-adress.com/whois/$session_ip\" target=\"_blank\">"._IP."</a>";
+						$viewer_ip = "<a href=\"https://whatismyipaddress.com/ip/".$session_ip."\" target=\"_blank\" style=\"color:#".$group_colour." !important;\">".$session_ip."</a>";
 					else
-						$viewer_ip = "$viewer_ip";
+						$viewer_ip = $filtered_ip;
+				}
+				if(filter_var( $session_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ))
+				{
+					$viewer_ip_bank = explode(':', $session_ip);
+					for($j=4;$j < count($viewer_ip_bank);$j++)
+						unset($viewer_ip_bank[$j]);
+						
+					$filtered_ip = implode(":",$viewer_ip_bank);
+					
+					if(is_admin())
+						$viewer_ip = "<a href=\"https://whatismyipaddress.com/ip/".$session_ip."\" target=\"_blank\" style=\"color:#".$group_colour." !important;\">".$filtered_ip."</a>";
+					else
+						$viewer_ip = $filtered_ip;
 				}
 				
 				// Skip multiple sessions for one user
-				if($session_user_id != ANONYMOUS)
+				if($session_user_id != ANONYMOUS && $user_type != 2)
 				{
 					if (!isset($online_users['online_users'][$session_user_id]))
 					{
@@ -317,6 +337,8 @@ class users_system{
 							"username" => $username,
 							"group_colour" => $group_colour,
 							"user_posts" => $user_posts,
+							"ip" => $session_ip,
+							"short_ip" => $filtered_ip,
 							"viewer_ip" => $viewer_ip,
 							"hidden" => ((!$session_viewonline) ? true:false),
 						);
@@ -327,6 +349,8 @@ class users_system{
 							$online_users['hidden_online']++;
 							
 						$online_users['members_online']++;
+					
+						$i++;
 					}
 				}
 				elseif($viewer_ip != '')
@@ -337,7 +361,6 @@ class users_system{
 						$online_users['guests_ips'][$session_ip] = $viewer_ip;
 					}
 				}
-				$i++;
 			}
 		}
 		$online_users['total_online'] = $online_users['guests_online'] + $online_users['visible_online'] + $online_users['hidden_online'];
@@ -353,11 +376,11 @@ class users_system{
 				$username = $this->data['username'];
 				$now = gmdate ('H');
 				if ($now < 12)
-					$greet_user =  ""._GOODMORNINGUSER."$username";
+					$greet_user =  ""._GOODMORNINGUSER." $username";
 				else if ($now < 18)
-					$greet_user =  ""._GOODAFTERNOONUSER."$username";
+					$greet_user =  ""._GOODAFTERNOONUSER." $username";
 				else if ($now >= 18 )
-					$greet_user =  ""._GOODEVENINGUSER."$username";
+					$greet_user =  ""._GOODEVENINGUSER." $username";
 			}
 			
 			if ($useavatars == 1)
@@ -366,8 +389,8 @@ class users_system{
 			if ($use_ranks == 1)
 				$your_rank_data = $this->phpbb_get_user_rank($this->data, $this->data['user_posts']);
 
-			if ($showpoints == 1 && isset($this->data['points']))
-				$your_points = number_format($this->data['points']);
+			if ($showpoints == 1 && isset($this->data['user_points']))
+				$your_points = number_format($this->data['user_points']);
 
 			if ($showpms == 1)
 			{
@@ -410,14 +433,15 @@ class users_system{
 			(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE (user_regdate > ? AND user_regdate < ? AND user_type != '2')) as yesterday_register,
 			(SELECT user_id FROM ".$this->users_table." WHERE user_type != '2' ORDER BY user_id DESC LIMIT 0,1) as last_user_id,
 			(SELECT username FROM ".$this->users_table." WHERE user_type != '2' ORDER BY user_id DESC LIMIT 0,1) as last_username,
+			(SELECT g.group_colour FROM ".$this->users_table." as u LEFT JOIN ".$this->groups_table." AS g ON g.group_id = u.group_id WHERE u.user_type != '2' ORDER BY u.user_id DESC LIMIT 0,1) as last_user_colour,						
 			(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE user_id > '1' AND user_type != '2') as total_users,
-			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=?) as today_visits,
-			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=?) as yesterday_visits,
+			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as today_visits,
+			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as yesterday_visits,
 			(SELECT count FROM ".STATISTICS_COUNTER_TABLE." WHERE type='total') as total_visits
 			From ".STATISTICS_COUNTER_TABLE." WHERE type = 'mosts'
 		", array($nowday, $yesterday, $nowday, $today_year, $today_month, $today_day, $yesterday_year, $yesterday_month, $yesterday_day));
 		$total_visits = 0;
-		
+
 		if($db->count() > 0)
 		{
 			foreach($result as $row)
@@ -428,6 +452,7 @@ class users_system{
 					$yesterday_register		= intval($row['yesterday_register']);
 					$last_user_id			= intval($row['last_user_id']);
 					$last_username			= filter($row['last_username'], "nohtml");
+					$last_user_colour		= filter($row['last_user_colour'], "nohtml");
 					$last_user_profile_url	= sprintf($this->profile_url, $last_user_id, $last_username);
 					$total_users			= intval($row['total_users']);
 					$today_visits			= intval($row['today_visits']);
@@ -483,6 +508,7 @@ class users_system{
 			"yesterday_register"	=> $yesterday_register,
 			
 			"last_user_id"			=> $last_user_id,
+			"last_user_colour"		=> $last_user_colour,
 			"last_username"			=> $last_username,
 			"last_user_profile_url"	=> $last_user_profile_url,
 			
@@ -492,9 +518,83 @@ class users_system{
 			"total_visits"			=> $total_visits,
 		);
 		
+		$db->query("SET NAMES '".$pn_dbcharset."'");
 		phpnuke_db_error();
 		return $statistics;
 	}
+	
+	/*public function add_user($user_data, $extra_data)
+	{
+		global $db, $nuke_configs, $userinfo, $users_system, $currentpage, $pn_dbcharset;
+		
+		$result1 = $db->query("SELECT group_id FROM ".$this->groups_table." WHERE group_name = 'REGISTERED'");
+		$rows = $result1->results();
+		$group_id = (isset($rows[0])) ? $rows[0]['group_id']:2;
+		
+		$insert_query = array(
+			'user_type' => 0, 
+			'group_id' => $group_id, 
+			'user_regdate' => $user_data['user_regdate'], 
+			'username' => $user_data['username'], 
+			'username_clean' => $user_data['username'], 
+			'user_password' => $user_data['user_pass'], 
+			'user_email' => $user_data['user_email'], 
+			'user_lang' => $user_data['user_lang'],
+		);
+		
+		if(isset($extra_data) && !empty($extra_data))
+		{
+			$insert_query = array_merge($insert_query,$extra_data);
+		}
+		
+		$db->table($this->users_table)
+			->insert($insert_query);
+			
+		if(!$db->error)
+		{
+			$user_id = $db->lastInsertId();
+			$db->table($this->user_group)
+				->insert([
+					"group_id" => $group_id,
+					"user_id" => $user_id,
+					"user_pending" => 0
+				]);
+			
+			$db->table($this->user_notifications_table)
+				->insert([
+					"item_type" => 'notification.type.post',
+					"item_id" => 0,
+					"user_id" => $user_id,
+					"method" => 'notification.method.email',
+					"notify" => 1,
+				]);
+			
+			$db->table($this->user_notifications_table)
+				->insert([
+					"item_type" => 'notification.type.topic',
+					"item_id" => 0,
+					"user_id" => $user_id,
+					"method" => 'notification.method.email',
+					"notify" => 1,
+				]);
+			
+			$db->table($this->profile_fields_data_table)
+				->insert([
+					"user_id" => $user_id,
+					"pf_phpbb_website" => $user_data['user_website']
+				]);
+				
+			$db->table($this->configs_table)
+				->multiinsert(["config_name","config_value","is_dynamic"], array(
+					array('newest_user_colour', '', 1),
+					array('newest_user_id', '50', 1),
+					array('newest_username', 'mahmood', 1),
+					array('num_users', '4', 1)
+				));
+			return true;
+		}
+		return false;
+	}*/
 	
 	public function clean_path($path)
 	{
@@ -593,7 +693,7 @@ class users_system{
 				$avatar_url .= '?s=' . max($width, $height);
 		}
 		else
-			$avatar_url = LinkToGT("images/blank.png");
+			$avatar_url = (file_exists("images/avatar.png")) ? LinkToGT("images/avatar.png"):LinkToGT("images/blank.gif");
 
 
 		return $avatar_url;
@@ -704,6 +804,21 @@ class users_system{
 		);
 		
 		return $extra_code;
+	}
+	
+	function get_profile_fields($user_id)
+	{
+		global $db;
+
+		$sql = 'SELECT *
+			FROM ' . $this->profile_fields_data_table . "
+			WHERE user_id = $user_id ORDER BY user_id ASC LIMIT 0,1";
+		$result = $db->query($sql);
+		if(intval($db->count()) > 0)
+		{
+			$row = $result->results()[0];
+			$this->data = array_merge($this->data, $row);
+		}
 	}
 	
     protected function preparePathInfo()
@@ -1306,6 +1421,7 @@ class users_system{
 	{
 		global $SID, $_SID, $db, $nuke_configs, $visitor_ip;
 
+		$db->query("SET NAMES '".$this->collation."'");
 		// Give us some basic information
 		$this->time_now				= _NOWTIME;
 		$this->cookie_data			= array('u' => 0, 'k' => '');
@@ -1410,13 +1526,14 @@ class users_system{
 		// if session id is set
 		if (!empty($this->session_id))
 		{
-			$sql = 'SELECT u.*, s.*
-				FROM ' . $this->sessions_table . ' s, ' . $this->users_table . " u
+			$sql = 'SELECT u.*, s.*, g.*
+				FROM ' . $this->sessions_table . ' s, ' . $this->users_table . ' u, ' . $this->groups_table . ' g
 				WHERE s.session_id = ?
-					AND u.user_id = s.session_user_id";
+					AND u.user_id = s.session_user_id
+					AND g.group_id = u.group_id';
 			$result = $db->query($sql, array($this->session_id));
 			$this->data = isset($result->results()[0]) ? $result->results()[0]:array();
-
+			$this->get_profile_fields($this->data['user_id']);
 			// Did the session exist in the DB?
 			if (isset($this->data['user_id']))
 			{
@@ -1488,6 +1605,7 @@ class users_system{
 	{
 		global $SID, $_SID, $db, $nuke_configs, $REQUSERURL, $pn_Cookies;
 
+		$db->query("SET NAMES '".$this->collation."'");
 		$this->data = array();
 		
 		$session_last_gc = (isset($nuke_configs['session_last_gc']) && $nuke_configs['session_last_gc'] > $this->config['session_last_gc']) ? $nuke_configs['session_last_gc']:$this->config['session_last_gc'];
@@ -1571,18 +1689,20 @@ class users_system{
 		// Else if we've been passed a user_id we'll grab data based on that
 		if (isset($this->cookie_data['k']) && $this->cookie_data['k'] && $this->cookie_data['u'] && !sizeof($this->data))
 		{
-			$sql = 'SELECT u.*
-				FROM ' . $this->users_table . ' u, ' . $this->sessions_keys_table . ' k
+			$sql = 'SELECT u.*, g.*
+				FROM ' . $this->users_table . ' u, ' . $this->sessions_keys_table . ' k, ' . $this->groups_table . ' g
 				WHERE u.user_id = ?
 					AND u.user_type IN (' . USER_NORMAL . ', ' . USER_FOUNDER . ")
 					AND k.user_id = u.user_id
+					AND g.group_id = u.group_id
 					AND k.key_id = ?";
 			$result = $db->query($sql, array((int) $this->cookie_data['u'], md5($this->cookie_data['k'])));
 			$user_data = isset($result->results()[0]) ? $result->results()[0]:array();
-
+			
 			if ($user_id === false || (isset($user_data['user_id']) && $user_id == $user_data['user_id']))
 			{
 				$this->data = $user_data;
+				$this->get_profile_fields($this->data['user_id']);
 				$bot = false;
 			}
 		}
@@ -1592,13 +1712,14 @@ class users_system{
 			$this->cookie_data['k'] = '';
 			$this->cookie_data['u'] = $user_id;
 
-			$sql = 'SELECT *
-				FROM ' . $this->users_table . '
-				WHERE user_id = ?
-					AND user_type IN (' . USER_NORMAL . ', ' . USER_FOUNDER . ')';
+			$sql = 'SELECT u.*, g.*
+				FROM ' . $this->users_table . ' u, ' . $this->groups_table . ' g
+				WHERE u.user_id = ?
+					AND u.user_type IN (' . USER_NORMAL . ', ' . USER_FOUNDER . ')
+					AND g.group_id = u.group_id';
 			$result = $db->query($sql, array((int) $this->cookie_data['u']));
 			$this->data = isset($result->results()[0]) ? $result->results()[0]:array();
-			print_r($this->data);
+			$this->get_profile_fields($this->data['user_id']);
 			$bot = false;
 		}
 
@@ -1622,14 +1743,16 @@ class users_system{
 			else
 			{
 				// We give bots always the same session if it is not yet expired.
-				$sql = 'SELECT u.*, s.*
+				$sql = 'SELECT u.*, s.*, g.*
 					FROM ' . $this->users_table . ' u
 					LEFT JOIN ' . $this->sessions_table . ' s ON (s.session_user_id = u.user_id)
+					LEFT JOIN ' . $this->groups_table . ' g ON (g.group_id = u.group_id)
 					WHERE u.user_id = ?';
 				$result = $db->query($sql, array((int) $bot));
 			}
 
 			$this->data = (isset($result->results()[0])) ? $result->results()[0]:array();
+			$this->get_profile_fields($this->data['user_id']);
 		}
 
 		if ($this->data['user_id'] != ANONYMOUS && !$bot)
@@ -1741,7 +1864,7 @@ class users_system{
 
 		$sql_ary['session_id'] = (string) $this->session_id;
 		//$sql_ary['session_page'] = (string) substr($this->page['page'], 0, 199);
-		$sql_ary['session_page'] = $REQUSERURL;
+		$sql_ary['session_page'] = ($REQUSERURL != '' && $REQUSERURL !== null) ? $REQUSERURL:"index.php";
 
 		$db->table($this->sessions_table)
 			->insert($sql_ary);
@@ -1756,6 +1879,7 @@ class users_system{
 		$SID = '?sid=' . $this->session_id;
 		$_SID = $this->session_id;
 		$this->data = array_merge($this->data, $sql_ary);
+		$this->get_profile_fields($this->data['user_id']);
 
 		if (!$bot)
 		{
@@ -1809,7 +1933,7 @@ class users_system{
 
 	function session_gc()
 	{
-		global $db, $config, $phpbb_container, $phpbb_dispatcher;
+		global $db, $config, $phpbb_container, $phpbb_dispatcher, $pn_dbcharset;
 
 		$batch_size = 10;
 
@@ -1872,6 +1996,7 @@ class users_system{
 
 		if ($del_sessions < $batch_size)
 		{
+			$db->query("SET NAMES '$pn_dbcharset'");
 			update_configs('session_last_gc', $this->time_now);
 			
 			// Less than 10 users, update gc timer ... else we want gc
@@ -1928,6 +2053,7 @@ class users_system{
 			$this->update_session($sql_ary);
 
 			$this->data = array_merge($this->data, $sql_ary);
+			$this->get_profile_fields($this->data['user_id']);
 		}
 	}
 }

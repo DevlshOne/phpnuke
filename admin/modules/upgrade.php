@@ -116,7 +116,7 @@ if (check_admin_permission($filename))
 			$archive = new PclZip("PHPNukeMTEdition-".$latest_version.".zip");
 			$archive->extract("./");
 			@unlink("PHPNukeMTEdition-".$latest_version.".zip");
-			$contents .= "<META HTTP-EQUIV=\"refresh\" content=\"2;URL=PHPNukeMTEdition-".$latest_version.".php\">";
+			$contents .= "<META HTTP-EQUIV=\"refresh\" content=\"2;URL=install.php\">";
 			$contents .="
 			<div align=\"center\">
 				<table id=\"product-table\" border=\"1\" width=\"600\">

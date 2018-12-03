@@ -217,7 +217,7 @@ if (check_admin_permission($module_name, false, true))
 		$row = $db->table(FEEDBACKS_TABLE)
 					->where('fid', $fid)
 					->first();
-		$replys = ($row['replys'] != '') ? phpnuke_unserialize(stripslashes($row['replys'])):"";
+		$replys = ($row['replys'] != '') ? phpnuke_unserialize(stripslashes($row['replys'])):array();
 		$custom_fields = ($row['custom_fields'] != '') ? phpnuke_unserialize(stripslashes($row['custom_fields'])):"";
 		
 		$feedback_configs = (isset($nuke_configs['feedbacks']) && $nuke_configs['feedbacks'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['feedbacks'])):array();
@@ -569,14 +569,14 @@ if (check_admin_permission($module_name, false, true))
 					addButton: $(\".add_field_button\"),
 					remove_button: '.remove_field',
 					fieldHTML: '<div style=\"margin-bottom:3px;\"><input placeholder=\""._LATIN_NAME."\" type=\"text\" class=\"inp-form-ltr\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][name]\" size=\"10\" />&nbsp;<input placeholder=\""._SUBJECT."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][title]\" size=\"10\" />&nbsp;<input placeholder=\""._DESCRIPTIONS."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][desc]\" size=\"10\" />&nbsp;<select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][{X}][required]\" style=\"width:100px;\"><option value=\"1\">"._REQUIRED."</option><option value=\"0\">"._NOT_REQUIRED."</option></select><select class=\"styledselect-select\" name=\"config_fields[feedbacks][custom_fields][{X}][data-rule]\" style=\"width:100px;\"><option value=\"number\">"._NUMERIC."</option><option value=\"string\">"._STRING."</option></select>&nbsp;<input placeholder=\""._FEEDBACK_ERROR_MESSAGE."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][custom_fields][{X}][data-msg]\" size=\"10\" />&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
-					x: $x1,
+					x: ".($x1+1).",
 				});
 				
 				$(\".input_dept_fields_wrap\").add_field({ 
 					addButton: $(\".add_dept_field_button\"),
 					remove_button: '.remove_field',
 					fieldHTML: '<div style=\"margin-bottom:3px;\"><input placeholder=\""._NAME_FAMILY."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][name]\" />&nbsp;<input placeholder=\""._RESPONSIBILITY."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][responsibility]\" />&nbsp;&nbsp;<input placeholder=\""._EMAIL."\" type=\"text\" class=\"inp-form\" value=\"\" name=\"config_fields[feedbacks][depts][{X}][email]\" />&nbsp; &nbsp; <a href=\"#\" class=\"remove_field\">"._REMOVE."</a></div>',
-					x: $x2,
+					x: ".($x2+1).",
 				});";
 				if(isset($feedback_configs['google_api']) && $feedback_configs['google_api'] != '')
 				{

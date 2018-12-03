@@ -1508,7 +1508,7 @@ if (check_admin_permission($filename)) {
 		."<table border=\"1\" width=\"100%\" align=\"center\" class=\"product-table\"><tr>"
 		."<th class=\"table-header-repeat line-left\">"._SITENAME."</th>"
 		."<th class=\"table-header-repeat line-left\">"._URL."</th>"
-		."<th class=\"table-header-repeat line-left\" style=\"width:100px;\">"._OPERATIONS."</th><tr>";
+		."<th class=\"table-header-repeat line-left\" style=\"width:100px;\">"._OPERATION."</th><tr>";
 		foreach ($nuke_headlines_cacheData as $hid => $nuke_headlines_info) {
 			$sitename = filter($nuke_headlines_info['sitename'], "nohtml");
 			$headlinesurl = filter($nuke_headlines_info['headlinesurl'], "nohtml");
@@ -1532,7 +1532,7 @@ if (check_admin_permission($filename)) {
 		$contents .= CloseAdminTable();
 		
 		include("header.php");
-		$html_output = $contents;
+		$html_output .= $contents;
 		include("footer.php");
 	}
 

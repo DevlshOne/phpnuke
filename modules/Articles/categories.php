@@ -51,8 +51,9 @@ function categories()
 			$contents .= "<table width=\"100%\" border=\"0\">";
 			foreach($array_contents as $key => $val)
 			{
+				if($val[0]['type'] == 1) continue;
 				if ($j==1) $contents	.= "<tr>";
-				$contents				.= "<td width=\"100\"><a href=\"".$val[2]."\">".$val[0]['cattext']."</a></td>";
+				$contents				.= "<td width=\"100\"><a href=\"".$val[2]."\">".category_lang_text($val[0]['cattext'])."</a></td>";
 				if ($j==5)
 				{
 					$j=0;

@@ -148,6 +148,7 @@ function pollMain($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 		$contents .= "<script src=\"".$nuke_configs['nukecdnurl']."modules/Surveys/includes/surveys.js\" type=\"text/javascript\" defer=\"defer\"></script>";
 		
 		$pollTitle = filter($poll_data['pollTitle'], "nohtml");
+		$description = stripslashes($poll_data['description']);
 		$pollUrl = filter($poll_data['pollUrl'], "nohtml");
 		$show_voters_num = intval($poll_data['show_voters_num']);
 		$voters = intval($poll_data['voters']);
@@ -169,6 +170,9 @@ function pollMain($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 				</div>";
 			}
 			$contents .= "<div class=\"form-group\">
+				<div class=\"col-sm-12\">".$description."</div>
+			</div>
+			<div class=\"form-group\">
 				<div class=\"col-sm-12\">";
 					foreach($options as $option_key => $option_data)
 					{
@@ -183,7 +187,7 @@ function pollMain($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 					<i class=\"glyphicon glyphicon-stats\"></i> <a href=\"".$poll_link[1]."\">"._RESULTS."</a><br>
 					<i class=\"glyphicon glyphicon-list-alt\"></i> <a href=\"".LinkToGT("index.php?modname=Surveys")."\">"._SURVEYS."</a><br>
 					<p>";
-						if($show_voters_num) $contents .= "<br><i class=\"glyphicon glyphicon-bullhorn\"></i> "._REGISTER_VOTES_NUM." : $voters راي<br>";
+						if($show_voters_num) $contents .= "<br><i class=\"glyphicon glyphicon-bullhorn\"></i> "._REGISTER_VOTES_NUM." : $voters "._VOTE."<br>";
 						$contents .= "<i class=\"glyphicon glyphicon-comment\"></i> <a href=\"".$poll_link[1]."#postcomments\">"._COMMENTS."</a><br>
 					</p>
 				</div>
@@ -221,6 +225,7 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 							->count();
 							
 	$pollTitle = filter($poll_data['pollTitle'], "nohtml");
+	$description = stripslashes($poll_data['description']);
 	$pollUrl = filter($poll_data['pollUrl'], "nohtml");
 	$voters = intval($poll_data['voters']);
 	$show_voters_num = intval($poll_data['show_voters_num']);
@@ -231,10 +236,12 @@ function pollResults($nuke_surveys_cacheData = '', $pollID, $in_block = false)
 	$poll_link = surveys_link($pollID, $pollTitle, $pollUrl);
 	
 	if(!$in_block)
-		$contents .= OpenTable("$pollTitle"." [ <a href=\"".$admin_file.".php?op=surveys_admin\">"._ADD."</a> | <a href=\"".$admin_file.".php?op=surveys_admin&mode=edit&pollID=$pollID\">"._EDIT."</a> ]");
+		$contents .= OpenTable("$pollTitle"."".((is_admin()) ? " [ <a href=\"".LinkToGT("".$admin_file.".php?op=surveys_admin")."\">"._ADD."</a> | <a href=\"".LinkToGT("".$admin_file.".php?op=surveys_admin&mode=edit&pollID=$pollID")."\">"._EDIT."</a> ]":"")."");
 		
 	if($in_block)
 		$contents .= "<div class=\"col-sm-12\">".$pollTitle."<br /><br /></div>";
+	
+	$contents .= "<div class=\"col-sm-12\">".$description."<br /><br /></div>";
 		
 	$contents .= "<div class=\"col-sm-12\">";
 	$striped_classes = array("striped", "success", "info", "warning", "danger");

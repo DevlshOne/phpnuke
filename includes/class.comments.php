@@ -30,7 +30,6 @@ class phpnuke_comments
 	private $post_id = 0;
 	private $total_rows = 0;
 	private $comments_rows = array();
-	private $smilies_codes = array();
 	private $all_parent_comments = array();
 	private $all_post_comments = array();
 
@@ -47,24 +46,6 @@ class phpnuke_comments
 		$this->Req_URIs			= $nuke_configs['REQUSERURL'];
 		$this->Req_URIs_2		= LinkToGT($this->Req_URIs.((isset($_GET['page']) && intval($_GET['page']) != 0) ? "comment-page-".intval($_GET['page'])."/":""));
 		$this->comments_configs = phpnuke_unserialize(stripslashes($nuke_configs['comments']));
-		$this->smilies_codes = array(
-			":)" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_biggrin.gif\" border=0 alt=':)' height=\"19\" width=\"19\" title=\"icon_biggrin\"></a>",
-			";)" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_arrow.gif\" border=0 alt=';)' height=\"19\" width=\"19\" title=\"icon_arrow\"></a>",
-			"|)" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_confused.gif\" border=0 alt='|)' height=\"19\" width=\"19\" title=\"icon_confused\"></a>", 
-			":-" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_cool.gif\" border=0 alt=':-' height=\"19\" width=\"19\" title=\"icon_cool\"></a>",
-			":(" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_cry.gif\" border=0 alt=':(' height=\"19\" width=\"19\" title=\"icon_cry\"></a> ",
-			":0" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_eek.gif\" border=0 alt=':0' height=\"19\" width=\"19\" title=\"icon_eek\"></a>",
-			':#' => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_evil.gif\" border=0 alt=':#' height=\"19\" width=\"19\" title=\"icon_evil\"></a>", 
-			"*)" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_exclaim.gif\" border=0 alt='*)' height=\"19\" width=\"19\" title=\"icon_exclaim\"></a>", 
-			"^)" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_razz.gif\" border=0 alt='^)' height=\"19\" width=\"19\" title=\"icon_razz\"></a>", 
-			"+))" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_surprised.gif\" border=0 alt='+))' height=\"19\" width=\"19\" title=\"icon_surprised\"></a>", 
-			":}" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_smile.gif\" border=0 alt=':}' height=\"19\" width=\"19\" title=\"icon_smile\"></a>", 
-			"|((" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_sad.gif\" border=0 alt='|((' height=\"19\" width=\"19\" title=\"icon_sad\"></a>",
-			"@:" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_rolleyes.gif\" border=0 alt='@:' height=\"19\" width=\"19\" title=\"icon_rolleyes\"></a>", 
-			"(:)" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_redface.gif\" border=0 alt='(:)' height=\"19\" width=\"19\" title=\"icon_redface\"></a>",
-			":?" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_question.gif\" border=0 alt=':?' height=\"19\" width=\"19\" title=\"icon_question\"></a>",
-			":**" => "<img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_idea.gif\" border=0 alt=':**' height=\"19\" width=\"19\" title=\"icon_idea\"></a>",
-		);
 		if(isset($comment_op) && $comment_op == "post_comments")
 			$this->output .= $this->post_comments($comment_form_fields);
     }
@@ -96,30 +77,39 @@ class phpnuke_comments
 					$newvotetype = "2,3";
 			}
 		
+			$groups_query = '';
+			if($nuke_configs['have_forum'] == 1)
+			{
+				$groups_query = "(SELECT g.group_colour FROM ".$users_system->users_table." as u LEFT JOIN ".$users_system->groups_table." AS g ON g.group_id = u.group_id WHERE u.username = c.username) as user_colour,	
+				(SELECT g2.group_name FROM ".$users_system->users_table." as u2 LEFT JOIN ".$users_system->groups_table." AS g2 ON g2.group_id = u2.group_id WHERE u2.username = c.username) as group_name,";
+			}
+
 			$where = array();
 			$where[] = "c.module = '".$this->module_name."'";
 			$where[] = "c.post_id = '".$this->post_id."'";
 			
 			if(!is_admin())
-				$where[] = "c.status = '1'";
+				$where[] = "(c.status = '1' OR c.username = '".$userinfo['username']."' OR c.ip = '$visitor_ip')";
 
+			$order_limit = "";
 			if($this->comments_configs['item_per_page'] > 0)
 			{
 				$entries_per_page			= $this->comments_configs['item_per_page'];
 				$current_page				= (empty($_GET['page'])) ? 1 : intval($_GET['page']);
 				$start_at					= ($current_page * $entries_per_page) - $entries_per_page;
 				$link_to					= $this->Req_URIs;
+				$order_limit = " LIMIT $start_at, ".$this->comments_configs['item_per_page']."";
 			}
 			
-			$total_rows_query = "(select count(*) from ".COMMENTS_TABLE." where ".str_replace("c.", "", implode(" AND ", $where))." ) as total_rows, ";
+			$total_rows_query = "(select count(*) from ".COMMENTS_TABLE." where ".str_replace("c.", "", implode(" AND ", $where))." AND pid = '0') as total_rows, ";
 			$first_where = "c.pid = '0'";
-			$order_limit = " LIMIT $start_at, ".$this->comments_configs['item_per_page']."";
 			
 			$query_all = "SELECT c.*, 
 				IF(c.username IS NULL OR c.username = '', '', (SELECT CONCAT_WS(',', ".$users_system->user_fields['user_avatar'].", ".$users_system->user_fields['user_avatar_type'].", ".$users_system->user_fields['user_email'].") FROM ".$users_system->users_table." WHERE ".$users_system->user_fields['username']." = c.username)) as user_avatar_data,
 				{TOTAL_ROWS_QUERY}
 				(select count(*) from ".COMMENTS_TABLE." where pid = c.cid) as replies, 
 				(select rid from ".REPORTS_TABLE." where post_id= c.cid AND module='comments' ORDER BY rid ASC LIMIT 1) as reported_id, 
+				$groups_query	
 				$votes_query 
 				FROM ".COMMENTS_TABLE." AS c 
 				LEFT OUTER JOIN ".SCORES_TABLE." AS sc ON sc.post_id = c.cid AND sc.votetype IN ($newvotetype) AND sc.db_table = 'Comments' 
@@ -147,13 +137,15 @@ class phpnuke_comments
 			}
 			
 			$this->output .= "
-			<a name=\"postcomments\"><a/>
+			<div class=\"clear\"></div>
+			<a name=\"postcomments\"></a>
 			<script>
-				function reply_to(cid, main_parent)
+				function reply_to(cid, main_parent, name, message)
 				{
 					$(\"#reply_pid\").val(cid);
 					main_parent = (main_parent == 0) ? cid:main_parent;
 					$(\"#reply_main_parent\").val(main_parent);		
+					$(\"#reply_to_html\").html('"._IN_REPLY." '+name+' : '+message );
 				}
 			</script>";
 			
@@ -181,7 +173,7 @@ class phpnuke_comments
 	
 	public function display_comments_childs($pid=0, $depth=0, $main_parent=0)
 	{
-		global $nuke_configs, $users_system, $pn_Cookies;
+		global $nuke_configs, $users_system, $pn_Cookies, $visitor_ip;
 
 		$pid = intval($pid);
 		$comments_show = '';
@@ -199,12 +191,13 @@ class phpnuke_comments
 				$post_comment['user_avatar_type'] = (isset($user_avatar_data['user_avatar_type']) && !empty($user_avatar_data['user_avatar_type'])) ? $user_avatar_data['user_avatar_type']:'';
 				$post_comment['user_email'] = (isset($user_avatar_data['user_email']) && !empty($user_avatar_data['user_email'])) ? $user_avatar_data['user_email']:'';
 				
-				$post_comment['deact'] = (is_admin() AND $post_comment['status'] == 0) ? "<p align=\"center\" style=\"color:#FF0000;\"><b>"._INACTIVE."</b></p>":"";
+				$post_comment['deact'] = ((is_admin() || $post_comment['ip'] == $visitor_ip) AND $post_comment['status'] == 0) ? "<p align=\"center\" style=\"color:#FF0000;\"><b>"._INACTIVE."</b></p>":"";
 				
 				$post_comment['avatar'] = ($post_comment['user_avatar'] != '') ? $users_system->get_gravatar_url($post_comment):LinkToGT("images/avatar-s.png");
 				
-				$post_comment['comment'] = str_replace(array_keys($this->smilies_codes), array_values($this->smilies_codes), $post_comment['comment']);
-				
+				$post_comment['comment'] = smilies_parse(stripslashes($post_comment['comment']));
+				$post_comment['user_colour'] = ($nuke_configs['have_forum'] == 1 && $post_comment['user_colour'] != '') ? $post_comment['user_colour']:"000000";
+
 				$post_comment['date'] = nuketimes($post_comment['date'], false, false, false, 1);
 				$post_comment['replies'] = intval($post_comment['replies']);
 				$main_parent = ($depth == 1) ? intval($post_comment['main_parent']):$main_parent;
@@ -235,50 +228,63 @@ class phpnuke_comments
 
 	private function comment_form()
 	{
-		global $nuke_configs, $userinfo, $last_comment_info;
+		global $nuke_configs, $users_system, $userinfo, $last_comment_info;
+		$is_user = is_user();
 		$content = "";
 		$content .="
+		<div class=\"clear\"></div>
 		\n\n<!-- COMMENTS FORM START -->\n
 		<a name=\"commenteditor\"></a>
-		<form class=\"form-horizontal\" role=\"form\" name = 'comments' action=\"".$this->Req_URIs_2."\" method=\"post\">";
-			if(isset($this->comments_configs['inputs']['name_act']) && $this->comments_configs['inputs']['name_act'] == 1)
+		<form class=\"form-horizontal\" style=\"margin:10px;\" role=\"form\" name = 'comments' action=\"".$this->Req_URIs_2."#commenteditor\" method=\"post\">
+			<div class=\"col-sm-2\"></div><div class=\"col-sm-10\" style=\"margin-bottom:8px;\" id=\"reply_to_html\"></div>";
+			if(isset($this->comments_configs['inputs']['name_act']) && $this->comments_configs['inputs']['name_act'] == 1 && (!$is_user || (isset($this->comments_configs['inputs']['name_enter']) && $this->comments_configs['inputs']['name_enter'] == 1)))
 			{
 				$name_req = (isset($this->comments_configs['inputs']['name_req']) && $this->comments_configs['inputs']['name_req'] == 1) ? " ("._REQUIERD.")":"";
-				$name_info = (isset($last_comment_info['name']) && $last_comment_info['name'] != '') ? filter($last_comment_info['name'], "nohtml"):((isset($userinfo['realname']) && $userinfo['realname'] != '') ? $userinfo['realname']:"");
+				$name_info = (isset($last_comment_info['name']) && $last_comment_info['name'] != '') ? filter($last_comment_info['name'], "nohtml"):((isset($userinfo[$users_system->user_fields['realname']]) && $userinfo[$users_system->user_fields['realname']] != '' && $userinfo[$users_system->user_fields['realname']] != 'anonymous') ? $userinfo[$users_system->user_fields['realname']]:"");
 			$content .="
+			<div class=\"col-sm-2\"></div><div class=\"col-sm-10\" style=\"margin-bottom:8px;\">"._GUEST_ADD_COMMENT."</div>
 			<div class=\"form-group\">
 				<label for=\"comment_form_fields_name\" class=\"col-sm-2 control-label\">"._NAME." : $name_req</label>
 				<div class=\"col-sm-10\">
-					<input type=\"text\" class=\"form-control\" id=\"comment_form_fields_name\" name=\"comment_form_fields[name]\" placeholder=\""._ENTER_NAME."\" value=\"\">
+					<input type=\"text\" class=\"form-control\" id=\"comment_form_fields_name\" name=\"comment_form_fields[name]\" placeholder=\""._ENTER_NAME."\" value=\"$name_info\">
 				</div>
-			</div>
-			<tr>";
+			</div>";
 			}
-			if(isset($this->comments_configs['inputs']['email_act']) && $this->comments_configs['inputs']['email_act'] == 1)
+			elseif($is_user)
+			{
+				$content .="
+				<div class=\"col-sm-2\"><input type=\"hidden\" name=\"comment_form_fields[name]\" value=\"".$userinfo[$users_system->user_fields['username']]."\"></div>
+				<div class=\"col-sm-10\" style=\"margin-bottom:8px;\">".sprintf(_USER_ADD_COMMENT, "<span style=\"color:#".$userinfo[$users_system->user_fields['group_colour']].";\">".$userinfo[$users_system->user_fields['username']]."</span>")."</div>";
+			}
+			if(isset($this->comments_configs['inputs']['email_act']) && $this->comments_configs['inputs']['email_act'] == 1 && (!$is_user || (isset($this->comments_configs['inputs']['email_enter']) && $this->comments_configs['inputs']['email_enter'] == 1)))
 			{
 				$email_req = (isset($this->comments_configs['inputs']['email_req']) && $this->comments_configs['inputs']['email_req'] == 1) ? " ("._REQUIERD.")":"";
-				$email_info = (isset($last_comment_info['email']) && $last_comment_info['email'] != '') ? filter($last_comment_info['email'], "nohtml"):((isset($userinfo['user_email']) && $userinfo['user_email'] != '') ? $userinfo['user_email']:"");
+				$email_info = (isset($last_comment_info['email']) && $last_comment_info['email'] != '') ? filter($last_comment_info['email'], "nohtml"):((isset($userinfo[$users_system->user_fields['user_email']]) && $userinfo[$users_system->user_fields['user_email']] != '') ? $userinfo[$users_system->user_fields['user_email']]:"");
 			$content .="
 			<div class=\"form-group\">
 				<label for=\"comment_form_fields_email\" class=\"col-sm-2 control-label\">"._EMAIL." : $email_req</label>
 				<div class=\"col-sm-10\">
-					<input type=\"email\" class=\"form-control\" id=\"comment_form_fields_email\" name=\"comment_form_fields[email]\" placeholder=\"example@domain.com\" value=\"\">
+					<input type=\"email\" class=\"form-control\" id=\"comment_form_fields_email\" name=\"comment_form_fields[email]\" placeholder=\"example@domain.com\" value=\"$email_info\">
 				</div>
 			</div>";
 			}
+			elseif($is_user)
+				$content .="<input type=\"hidden\" name=\"comment_form_fields[user_email]\" value=\"".$userinfo[$users_system->user_fields['user_email']]."\">";
 				
-			if(isset($this->comments_configs['inputs']['url_act']) && $this->comments_configs['inputs']['url_act'] == 1)
+			if(isset($this->comments_configs['inputs']['url_act']) && $this->comments_configs['inputs']['url_act'] == 1 && (!$is_user || (isset($this->comments_configs['inputs']['url_enter']) && $this->comments_configs['inputs']['url_enter'] == 1)))
 			{
 				$url_req = (isset($this->comments_configs['inputs']['url_req']) && $this->comments_configs['inputs']['url_req'] == 1) ? " ("._REQUIERD.")":"";
-				$url_info = (isset($last_comment_info['url']) && $last_comment_info['url'] != '') ? filter($last_comment_info['url'], "nohtml"):((isset($userinfo['user_website']) && $userinfo['user_website'] != '') ? $userinfo['user_website']:"");
+				$url_info = (isset($last_comment_info['url']) && $last_comment_info['url'] != '') ? filter($last_comment_info['url'], "nohtml"):((isset($userinfo[$users_system->user_fields['user_website']]) && $userinfo[$users_system->user_fields['user_website']] != '') ? $userinfo[$users_system->user_fields['user_website']]:"");
 			$content .="
 			<div class=\"form-group\">
 				<label for=\"comment_form_fields_url\" class=\"col-sm-2 control-label\">"._URL." $url_req</label>
 				<div class=\"col-sm-10\">
-					<input type=\"text\" class=\"form-control\" id=\"comment_form_fields_url\" name=\"comment_form_fields[url]\" placeholder=\"http://www.domain.com\" value=\"\">
+					<input type=\"text\" class=\"form-control\" id=\"comment_form_fields_url\" name=\"comment_form_fields[url]\" placeholder=\"http://www.domain.com\" value=\"$url_info\">
 				</div>
 			</div>";
 			}
+			elseif($is_user)
+				$content .="<input type=\"hidden\" name=\"comment_form_fields[url]\" value=\"".$userinfo[$users_system->user_fields['user_website']]."\">";
 			$content .="
 			<div class=\"form-group\">
 				<label for=\"comment_form_fields_message\" class=\"col-sm-2 control-label\">"._UCOMMENT."</label>
@@ -290,27 +296,13 @@ class phpnuke_comments
 						function Smiles(which)
 						{
 							var old_val = $(\"#comment_form_fields_textarea\").val();
-							$(\"#comment_form_fields_textarea\").val(old_val+which);
+							$(\"#comment_form_fields_textarea\").val(old_val+' '+which+' ');
 						} 
 					</script>";
 					$content .="
-					<textarea class=\"form-control\" rows=\"4\" name=\"comment_form_fields[comment]\" id=\"comment_form_fields_textarea\"></textarea><br><br>
-					<a href=\"javascript:Smiles(':)')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_biggrin.gif\" border=0 alt=':)' height=\"19\" width=\"19\" title=\"icon_biggrin\"></a> 
-					<a href=\"javascript:Smiles(';)')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_arrow.gif\" border=0 alt=';)' height=\"19\" width=\"19\" title=\"icon_arrow\"></a> 
-					<a href=\"javascript:Smiles('|)')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_confused.gif\" border=0 alt='|)' height=\"19\" width=\"19\" title=\"icon_confused\"></a> 
-					<a href=\"javascript:Smiles(':-')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_cool.gif\" border=0 alt=':-' height=\"19\" width=\"19\" title=\"icon_cool\"></a> 
-					<a href=\"javascript:Smiles(':(')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_cry.gif\" border=0 alt=':(' height=\"19\" width=\"19\" title=\"icon_cry\"></a> 
-					<a href=\"javascript:Smiles(':0')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_eek.gif\" border=0 alt=':0' height=\"19\" width=\"19\" title=\"icon_eek\"></a> 
-					<a href=\"javascript:Smiles(':#')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_evil.gif\" border=0 alt=':#' height=\"19\" width=\"19\" title=\"icon_evil\"></a> 
-					<a href=\"javascript:Smiles('*)')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_exclaim.gif\" border=0 alt='*)' height=\"19\" width=\"19\" title=\"icon_exclaim\"></a> 
-					<a href=\"javascript:Smiles('^)')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_razz.gif\" border=0 alt='^)' height=\"19\" width=\"19\" title=\"icon_razz\"></a> 
-					<a href=\"javascript:Smiles('+))')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_surprised.gif\" border=0 alt='+))' height=\"19\" width=\"19\" title=\"icon_surprised\"></a> 
-					<a href=\"javascript:Smiles(':}')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_smile.gif\" border=0 alt=':}' height=\"19\" width=\"19\" title=\"icon_smile\"></a> 
-					<a href=\"javascript:Smiles('|((')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_sad.gif\" border=0 alt='|((' height=\"19\" width=\"19\" title=\"icon_sad\"></a> 
-					<a href=\"javascript:Smiles('@:')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_rolleyes.gif\" border=0 alt='@:' height=\"19\" width=\"19\" title=\"icon_rolleyes\"></a> 
-					<a href=\"javascript:Smiles('(:)')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_redface.gif\" border=0 alt='(:)' height=\"19\" width=\"19\" title=\"icon_redface\"></a> 
-					<a href=\"javascript:Smiles(':?')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_question.gif\" border=0 alt=':?' height=\"19\" width=\"19\" title=\"icon_question\"></a> 
-					<a href=\"javascript:Smiles(':**')\"><img src=\"".$nuke_configs['nukecdnurl']."images/smiles/icon_idea.gif\" border=0 alt=':**' height=\"19\" width=\"19\" title=\"icon_idea\"></a>";
+					<textarea class=\"form-control\" rows=\"4\" name=\"comment_form_fields[comment]\" id=\"comment_form_fields_textarea\"></textarea><br><br>";
+					
+					$content .= smilies_parse('', true);
 				}
 				elseif($this->comments_configs['editor'] == 2)
 				{
@@ -333,7 +325,7 @@ class phpnuke_comments
 					<div class=\"form-group\">
 						<label for=\"comment_form_fields_human\" class=\"col-sm-2 control-label\">"._SECCODE."</label>
 						<div class=\"col-sm-10\">
-							".$security_code_input['image']."<br /><br />".$security_code_input['input']."
+							<div class=\"comment_seccode\">".$security_code_input['image']."<br /><br />".$security_code_input['input']."</div>
 						</div>
 					</div>";
 				}
@@ -488,7 +480,7 @@ class phpnuke_comments
 		}
 		else
 		{
-			$this->output .= "<div class=\"text-center\"><span style=\"color:#ff0000;\">کد امنیتی اشتباه است</span></div>";
+			$this->output .= "<div class=\"text-center\"><span style=\"color:#ff0000;\">"._BADSECURITYCODE."</span></div>";
 		}
 	}
 }

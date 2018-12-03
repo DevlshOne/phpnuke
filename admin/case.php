@@ -167,6 +167,7 @@ switch($op) {
 	case "security_config":
 	case "uploads_config":
 	case "forums_config":
+	case "smilies_config":
 	case "others_config":
 		include("admin/modules/settings.php");
 	break;

@@ -33,7 +33,7 @@ class users_system{
 			$this->strip = (@get_magic_quotes_gpc()) ? true : false;
 		}
 		
-		// define default user fileds of phpbb system
+		// define default user fileds of phpnuke system
 		$this->user_fields['user_id']				= "user_id";
 		$this->user_fields['username']				= "username";
 		$this->user_fields['realname']				= $this->user_fields['name'] = "user_realname";
@@ -42,8 +42,8 @@ class users_system{
 		$this->user_fields['user_lastvisit']		= "user_lastvisit";
 		$this->user_fields['user_avatar']			= "user_avatar";
 		$this->user_fields['user_avatar_type']		= "user_avatar_type";
-		$this->user_fields['user_avatar']			= "user_avatar";
-		$this->user_fields['user_avatar_type']		= "user_avatar_type";
+		$this->user_fields['user_avatar_width']		= "user_avatar_width";
+		$this->user_fields['user_avatar_height']	= "user_avatar_height";
 		$this->user_fields['user_email']			= "user_email";
 		$this->user_fields['username_clean']		= "username";
 		$this->user_fields['user_website']			= "user_website";
@@ -67,7 +67,7 @@ class users_system{
 	
 	public function MTForumBlock($p=1)
 	{
-		return "عدم پشتيباني از تالار گفتمان";
+		return _NO_FORUM_SUPPORTED;
 	}
 		
 	public function user_statistics()
@@ -140,19 +140,33 @@ class users_system{
 					$your_info = $row;
 					
 				$viewer_ip = '';
+				$filtered_ip = '';
 				
 				if($showips == 1)
 				{
 					$viewer_ip_bank = explode('.', $session_ip);
 					for($j=2;$j < count($viewer_ip_bank);$j++)
-						$viewer_ip_bank[$j] = "-";
+						$viewer_ip_bank[$j] = "***";
 						
-					$viewer_ip = implode(".",$viewer_ip_bank);
+					$filtered_ip = implode(".",$viewer_ip_bank);
 					
 					if(is_admin())
-						$viewer_ip = "<a href=\"http://www.ip-adress.com/whois/$session_ip\" target=\"_blank\">"._IP."</a>";
+						$viewer_ip = "<a href=\"https://whatismyipaddress.com/ip/".$session_ip."\" target=\"_blank\">".$session_ip."</a>";
 					else
-						$viewer_ip = "$viewer_ip";
+						$viewer_ip = $filtered_ip;
+				}
+				if(filter_var( $session_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 ))
+				{
+					$viewer_ip_bank = explode(':', $session_ip);
+					for($j=4;$j < count($viewer_ip_bank);$j++)
+						unset($viewer_ip_bank[$j]);
+						
+					$filtered_ip = implode(":",$viewer_ip_bank);
+					
+					if(is_admin())
+						$viewer_ip = "<a href=\"https://whatismyipaddress.com/ip/".$session_ip."\" target=\"_blank\">".$filtered_ip."</a>";
+					else
+						$viewer_ip = $filtered_ip;
 				}
 				
 				// Skip multiple sessions for one user
@@ -171,11 +185,13 @@ class users_system{
 							"where" => $where,
 							"profile" => LinkToGT("index.php?modname=Your_Account&op=userinfo&username=$username"),
 							"username" => $username,
+							"ip" => $session_ip,
 							"viewer_ip" => $viewer_ip,
+							"short_ip" => $filtered_ip,
 							"group_colour" => '',
 							"user_posts" => '',
 							"hidden" => ((!$user_allow_viewonline) ? true:false),
-						);
+						);						
 					
 						if ($user_allow_viewonline)
 							$online_users['visible_online']++;
@@ -183,6 +199,8 @@ class users_system{
 							$online_users['hidden_online']++;
 							
 						$online_users['members_online']++;
+						
+						$i++;
 					}
 				}
 				elseif($viewer_ip != '')
@@ -193,7 +211,6 @@ class users_system{
 						$online_users['guests_ips'][$session_ip] = $viewer_ip;
 					}
 				}
-				$i++;
 			}
 		}
 		$online_users['total_online'] = $online_users['guests_online'] + $online_users['visible_online'] + $online_users['hidden_online'];
@@ -209,11 +226,11 @@ class users_system{
 				$username = $this->data['username'];
 				$now = gmdate ('H');
 				if ($now < 12)
-					$greet_user =  ""._GOODMORNINGUSER."$username";
+					$greet_user =  ""._GOODMORNINGUSER." $username";
 				else if ($now < 18)
-					$greet_user =  ""._GOODAFTERNOONUSER."$username";
+					$greet_user =  ""._GOODAFTERNOONUSER." $username";
 				else if ($now >= 18 )
-					$greet_user =  ""._GOODEVENINGUSER."$username";
+					$greet_user =  ""._GOODEVENINGUSER." $username";
 			}
 			
 			if ($useavatars == 1)
@@ -256,8 +273,8 @@ class users_system{
 			(SELECT user_id FROM ".$this->users_table." ORDER BY user_id DESC LIMIT 0,1) as last_user_id,
 			(SELECT username FROM ".$this->users_table." ORDER BY user_id DESC LIMIT 0,1) as last_username,
 			(SELECT COUNT(user_id) FROM ".$this->users_table." WHERE user_id > '1') as total_users,
-			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=?) as today_visits,
-			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=?) as yesterday_visits,
+			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as today_visits,
+			(SELECT hits FROM ".STATISTICS_TABLE." WHERE year=? AND month=? AND day=? ORDER BY id DESC LIMIT 1) as yesterday_visits,
 			(SELECT count FROM ".STATISTICS_COUNTER_TABLE." WHERE type='total') as total_visits
 			From ".STATISTICS_COUNTER_TABLE." WHERE type = 'mosts'
 		", array($nowday, $yesterday, $nowday, $today_year, $today_month, $today_day, $yesterday_year, $yesterday_month, $yesterday_day));
@@ -340,6 +357,31 @@ class users_system{
 		return $statistics;
 	}
 	
+	public function add_user($user_data)
+	{
+		global $db, $nuke_configs, $userinfo, $users_system, $currentpage, $pn_dbcharset;
+					
+		$insert_query = array(
+			'user_type' => 1, 
+			'username' => $user_data['username'], 
+			'user_email' => $user_data['user_email'], 
+			'user_password' => $user_data['user_password'], 
+			'user_regdate' => $user_data['user_regdate'], 
+			'user_realname' => $user_data['user_realname'],
+			'user_lang' => $user_data['user_lang'],
+			'user_website' => $user_data['user_website'],
+		);
+		
+		$result1 = $db->table($this->users_table)
+			->insert($insert_query);
+		
+		if($result1)
+		{
+			return true;
+		}
+		return false;
+	}
+	
 	public function get_avatar_url($row, $width=100, $height=100, $ignore_config=false)
 	{
 		global $nuke_configs, $ya_config;
@@ -369,7 +411,7 @@ class users_system{
 				$avatar_url .= '?s=' . max($row['avatar_width'], $row['avatar_height']);
 		}
 		else
-			$avatar_url = LinkToGT("images/avatar.png");
+			$avatar_url = (file_exists("images/avatar.png")) ? LinkToGT("images/avatar.png"):LinkToGT("images/blank.gif");
 
 
 		return $avatar_url;
@@ -460,6 +502,8 @@ class users_system{
 		
 		$past = _NOWTIME-(($nuke_config['session_timeout'] != "") ? $nuke_config['session_timeout']:3600);
 		$session_browser = $_SERVER['HTTP_USER_AGENT'];
+		
+		$currentpage = ($currentpage != '' && $currentpage !== null) ? $currentpage:"index.php";
 		
 		$db->table(SESSIONS_TABLE)
 			->where('session_time', '<', $past)

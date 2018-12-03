@@ -65,6 +65,10 @@ class Database implements \IteratorAggregate, \ArrayAccess
 	     */
         $_lastWhere = "",
 	    /**
+	     *  @var $_lastParams string to store last sql parameters
+	     */
+        $_lastParams = "",
+	    /**
 	     *  @var $_sql string save query string
 	     */
         $_sql,
@@ -81,8 +85,14 @@ class Database implements \IteratorAggregate, \ArrayAccess
 	     * @var $config array to save database config
 	     */
 		$_config = [],
-		
-		$_lastInsertedId = 0;
+	    /**
+	     * @var $_lastInsertedId array to save last inserted id
+	     */		
+		$_lastInsertedId = 0,
+	    /**
+	     * @var $__whereTypes array to parse where conditions
+	     */	
+		$__whereTypes = ['AND', 'OR'];
 
 
     protected
@@ -539,6 +549,7 @@ class Database implements \IteratorAggregate, \ArrayAccess
 				$this->_errors[] = array_merge($e->errorInfo, array($sql));
 		}
 
+		$this->_lastParams = $this->_params;
 		$this->_params = [];
 
         return $this;
@@ -656,7 +667,40 @@ class Database implements \IteratorAggregate, \ArrayAccess
 		
         return false;
     }
+	
+	/**
+	 * insert or update if exists
+	 * @param $values
+	 * @param array $conditionColumn
+	 * @return bool|mixed
+	 */
+	public function createOrUpdate($values, $conditionColumn = [])
+	{
+		// check if we have condition for update
+		// the condition must be ([column_name, value])
+		if(count($conditionColumn))
+		{
+			$column = $conditionColumn[0];
+			$value  = $conditionColumn[1];
+		}
+		else // if no condition so search by ID
+		{
+			$column = $this->_idColumn;
+			$value  = isset($value[$this->_ColumnsId]) ? $value[$this->_ColumnsId] : null;
+		}
 
+		// check if any records exists by condition
+		$exists = $this->where($column, $value)->first()->results();
+		// if exist so update the record's
+		if(count($exists))
+		{
+			return $this->where($column, $value)
+				->update($values);
+		}
+		// insert new record
+		return $this->insert($values);
+	}
+	
     /**
      * DB::update()
      *
@@ -665,7 +709,7 @@ class Database implements \IteratorAggregate, \ArrayAccess
      * @param array $where
      * @return bool
      */
-    public function update($values = [], $_lastWhere = '')
+    public function update($values = [], $_lastWhere = '', $_lastParams = '')
     {
         /**
          * @var $set type string
@@ -687,6 +731,7 @@ class Database implements \IteratorAggregate, \ArrayAccess
         $sql = "UPDATE {$this->_table} SET {$set} " . (($this->_query != '') ? $this->_query:$_lastWhere);
 
         // check if query is not have an error
+		$this->_params = (isset($this->_params) && !empty($this->_params)) ? $this->_params:$_lastParams;
         if(!$this->query($sql, array_merge($values, $this->_params))->error()) {
             return true;
         }
@@ -711,8 +756,8 @@ class Database implements \IteratorAggregate, \ArrayAccess
 
 		    $x++;
 	    }*/
-
-	    return $this->update((array)$this->getNewValues(), $this->_lastWhere);
+		
+	    return $this->update((array)$this->getNewValues(), self::$_instance->_lastWhere, self::$_instance->_lastParams);
     }
 
     /**
@@ -738,7 +783,7 @@ class Database implements \IteratorAggregate, \ArrayAccess
 		return $this->collection([
             'results' => $this->query($sql, $this->_params)->results(),
             'table'   => $this->_table,
-            'where'   => $this->_table,
+            'where'   => $this->_where,
             'id'      => $this->_idColumn
         ]);
 
@@ -870,7 +915,63 @@ class Database implements \IteratorAggregate, \ArrayAccess
         $this->_where = "AND";
         return $this;
     }
+	
+	/**
+	 * How to use
+	 * $con = [
+	 *  [
+	 *      'sex', '=', 'female'
+	 *  ],
+	 * 'AND' => [
+	 *      'position', '=', 'manager'
+	 *  ]
+	 * ];
+	 * $db->table('table_name')->parseWhere($con)->select();
+	 */
+	public function parseWhere(array $cons, $type = "AND")
+	{
 
+		$this->_query .= " {$type} (";
+
+		foreach ($cons as $con => $st)
+		{
+			if(is_array($st))
+			{
+				if(!is_numeric($st[2]))
+					$st[2] = "'$st[2]'";
+				else
+					$st[2] = "`$st[2]`";
+
+				if (strtolower($con) === 'none' || $con === 0)
+				{
+					$this->_query .= " `{$st[0]}` $st[1] $st[2] ";
+				}
+				else
+				{
+					if ($this->con($con))
+					{
+						$this->_query .= " {$con} `{$st[0]}` $st[1] $st[2] ";
+					}
+				}
+			}
+			else
+			{
+				$this->_query .= " `{$cons[0]}` $cons[1] $cons[2] ";
+				break;
+			}
+			
+		}
+
+		$this->_query .= ')';
+
+		return $this;
+	}
+
+	private function con($con)
+	{
+		return in_array(strtoupper($con), $this->__whereTypes);
+	}
+	
     /**
      * between condition
      * @param  string $field  table field name
@@ -1984,3 +2085,5 @@ class Collection extends Database
         return $items;
     }
 }
+
+?>

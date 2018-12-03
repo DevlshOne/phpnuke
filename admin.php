@@ -57,6 +57,9 @@ if ((isset($aid)) && (isset($pwd)) && (isset($op)) && ($op == "login"))
 	{
 		$code_accepted = false;
 		
+		$security_code = (isset($security_code)) ? $security_code:"";
+		$security_code_id = (isset($security_code_id)) ? $security_code_id:"";
+		
 		if(extension_loaded("gd") && in_array("admin_login", $nuke_configs['mtsn_gfx_chk']))
 			$code_accepted = code_check($security_code, $security_code_id);
 		else
@@ -271,6 +274,8 @@ function login()
 
 	define("ADMIN_LOGIN", true);
 	$contents = '';
+	
+	$pn_Sessions->destroy();
 	
 	$pn_Sessions->get("nuke_authors", false);
 	
@@ -1080,11 +1085,7 @@ function adminMain()
 					</tr>
 					<tbody>";
 						
-					$result = $db->table(FEEDBACKS_TABLE)
-								->where('replys', '')
-								->order_by(['fid' => 'DESC'])
-								->limit(0,5)
-								->select();
+					$result = $db->query("SELECT * FROM ".FEEDBACKS_TABLE." WHERE replys IS NULL OR replys = '' ORDER BY fid DESC LIMIT 0,5");
 								
 					if($db->count() > 0)
 					{
@@ -1190,7 +1191,7 @@ function adminMain()
 							$contents .= "<tr style=\"border-bottom:1px solid #eee;\">
 								<td style=\"padding-right:10px;\"><a href=\"$post_link\" target=\"_blank\">$subject</a></td>
 								<td align=\"center\">
-									<a href=\"".$admin_file.".php?op=feedbacks&mode=delete&fids=$rid\" title=\""._DELETE."\" class=\"table-icon icon-2 info-tooltip\" onclick=\"return confirm('"._REPORT_DELETE_CONFIRM."');\"></a>
+									<a href=\"".$admin_file.".php?op=reports&mode=delete&rids=$rid\" title=\""._DELETE."\" class=\"table-icon icon-2 info-tooltip\" onclick=\"return confirm('"._REPORT_DELETE_CONFIRM."');\"></a>
 									<a href=\"#TB_inline?height=300&amp;width=600&amp;inlineId=reports_".$rid."\" title=\""._SHOW."\" class=\"table-icon icon-7 info-tooltip thickbox\"></a>
 									<div id=\"reports_".$rid."\" style=\"display:none;\">
 										<p>$message</p>
@@ -1205,7 +1206,14 @@ function adminMain()
 			</div>
 		</div>
 		<div class=\"clear\"></div>
-		";
+		<div align=\"center\">
+		<table width=\"98%\" class=\"product-table min_table no-border\">
+			<tr>
+				<th class=\"table-header-repeat line-left\" style=\"width:50px;\"><a>"._LATEST_NUKE_NEWS."</a></th>
+			</tr>
+			<tr><td><ul style=\"list-style:none;margin-"._TEXTALIGN1.":5px;\">".get_latest_news_from_nuke()."</ul></td></tr>
+		</table>
+		</div>";
 	include("header.php");
 	$html_output .= $contents;
 	include("footer.php");
@@ -1213,7 +1221,7 @@ function adminMain()
 
 function get_latest_news_from_nuke()
 {
-
+	global $PnValidator, $nuke_configs;
 	$file_info = phpnuke_get_url_contents("http://www.phpnuke.ir/notice.html", true);
 
 	if ($file_info)
@@ -1240,11 +1248,11 @@ function get_latest_news_from_nuke()
 			}
 			$contents .= "<li><a href=\"".$article['link']."\" target=\"_blank\" rel=\"no-follow\">".$article['title']."</a></li>";
 		}
-		die($contents);
+		return $contents;
 	}
 	else
 	{
-		die(_DOWNLOAD_PHPNUKEIR_PROBLEM);
+		return _DOWNLOAD_PHPNUKEIR_PROBLEM;
 	}
 }
 
@@ -1253,7 +1261,7 @@ function show_log_list($log_type=1)
 	global $db, $admin_file, $pagetitle;
 	$contents = '';
 	$contents .= GraphicAdmin();
-	$log_name = ($log_type == 1) ? _ADMINA:_USERS;
+	$log_name = ($log_type == 1) ? _ADMINS:_USERS;
 	$pagetitle = "فعالیتهای $log_name";
 	$contents .= "<table width=\"100%\" class=\"product-table min_table\">
 			<tr>
@@ -1356,12 +1364,15 @@ if($admintest)
 			}
 			
 			require_once("admin/case.php");
-			foreach ($nuke_modules_cacheData as $mid => $module_info)
+			if(isset($nuke_modules_cacheData) && is_array($nuke_modules_cacheData))
 			{
-				$mod_title = $module_info['title'];
-				if (file_exists("modules/$mod_title/admin/index.php") AND file_exists("modules/$mod_title/admin/links.php") AND file_exists("modules/$mod_title/admin/case.php"))
+				foreach ($nuke_modules_cacheData as $mid => $module_info)
 				{
-					include("modules/$mod_title/admin/case.php");
+					$mod_title = $module_info['title'];
+					if (file_exists("modules/$mod_title/admin/index.php") AND file_exists("modules/$mod_title/admin/links.php") AND file_exists("modules/$mod_title/admin/case.php"))
+					{
+						include("modules/$mod_title/admin/case.php");
+					}
 				}
 			}
 		break;

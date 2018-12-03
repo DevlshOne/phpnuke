@@ -97,6 +97,8 @@ RewriteCond %{HTTP:X-Moz} pre[a-z]
 RewriteRule .* - [F,L]
 #####################################  End mozilla firefox prefeching prevent
 
+RewriteRule ^files/News/(.*)$ /files/Articles/$1 [NC,L]
+
 RewriteRule ^index\.php$ - [L]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

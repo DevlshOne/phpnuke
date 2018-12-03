@@ -37,7 +37,7 @@ if (check_admin_permission($filename))
 		$entries_per_page = 50;
 		$current_page = (empty($_GET['page'])) ? 1 : $_GET['page'];
 		$start_at  = ($current_page * $entries_per_page) - $entries_per_page;
-		$link_to = "".$admin_file.".php?op=hreferer";
+		$link_to = "".$admin_file.".php?op=hreferrer";
 		
 		$result = $db->query("SELECT *, (SELECT COUNT(rid) FROM ".REFERRER_TABLE.") AS total_rows from ".REFERRER_TABLE." ORDER BY rid DESC LIMIT ?, ?", array($start_at, $entries_per_page));
 		
@@ -74,7 +74,7 @@ if (check_admin_permission($filename))
 					<td align=\"center\">$time</td>
 					<td align=\"center\" class=\"dleft\">$ip</td>
 					<td align=\"center\" class=\"dleft\"><a href=\"index.php?url=$url_encoded\" target=\"_new\" title=\"$url\" class=\"info-tooltip\">$url_short</a></td>
-					<td align=\"center\" class=\"dleft\"><a href=\"index.php?url=".$path."\" target=\"_new\" class=\"info-tooltip\">$path_short</a></td>
+					<td align=\"center\" class=\"dleft\"><a href=\"index.php?url=".$url_encoded."\" target=\"_new\" class=\"info-tooltip\">$path_short</a></td>
 					<td align=\"center\"><a href=\"".$admin_file.".php?op=delreferrer&rid=$rid\" class=\"table-icon icon-2 info-tooltip\" title=\""._DELETE."\" onclick=\"return confirm('"._DELETE_THIS_SURE."');\"></a> <input type=\"checkbox\" class=\"styled\" name=\"rid[]\" value=\"$rid\" /></td>
 				</tr>";
 			}

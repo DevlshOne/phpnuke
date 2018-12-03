@@ -554,6 +554,7 @@ $lang = array_merge($lang, array(
 	'LOG_BBCODE_ADD'		=> '<strong>BBCode جدیدی اضافه شد</strong><br />» %s',
 	'LOG_BBCODE_EDIT'		=> '<strong>BBCode ویرایش شد</strong><br />» %s',
 	'LOG_BBCODE_DELETE'		=> '<strong>BBCode حذف شد</strong><br />» %s',
+	'LOG_BBCODE_CONFIGURATION_ERROR'	=> '<strong>خطا هنگام تنظیمات BBCode</strong>: %1$s<br />» %2$s',
 
 	'LOG_BOT_ADDED'		=> '<strong>روبات جدیدی اضافه شد</strong><br />» %s',
 	'LOG_BOT_DELETE'	=> '<strong>روبات حذف شد</strong><br />» %s',

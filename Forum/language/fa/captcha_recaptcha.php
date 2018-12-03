@@ -40,7 +40,7 @@ if (empty($lang) || !is_array($lang))
 // in a url you again do not need to specify an order e.g., 'Click %sHERE%s' is fine
 
 $lang = array_merge($lang, array(
-	'RECAPTCHA_LANG'				=> 'fa',
+	'RECAPTCHA_LANG'				=> 'fa', // زبان مربوطه را اینجا پیدا کنید https://developers.google.com/recaptcha/docs/language - If no code exists for your language you can use "en" or leave the string empty
 	'RECAPTCHA_NOT_AVAILABLE'		=> 'برای استفاده از reCaptcha شما باید یک حساب روی <a href="http://www.google.com/recaptcha">www.google.com/recaptcha</a> ایجاد کرده باشید.',
 	'CAPTCHA_RECAPTCHA'				=> 'reCaptcha',
 	'RECAPTCHA_INCORRECT'			=> 'جواب شما نادرست است.',

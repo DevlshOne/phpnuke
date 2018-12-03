@@ -144,12 +144,12 @@ function search_main($submit = '', $search_query='', $search_module = 'Articles'
 		$this_search_data = isset($search_data_configs[$search_module]) ? $search_data_configs[$search_module]:$search_data_configs['Articles'];
 
 		$PnValidator->validation_rules(array(
-			'search_query'	=> 'required|regex,/^([a-zA-Z0-9+_-اآبپتثجچحخدذرزژسشصضطظعغفقكکگلمنوهیي])+$/i'
+			'search_query'	=> 'required|regex,/([^\>])+$/i'
 		)); 
 		
 		// Get or set the filtering rules
 		$PnValidator->filter_rules(array(
-			'search_query'	=> 'sanitize_string|rawurldecode',
+			'search_query'	=> 'sanitize_string|rawurldecode|htmlspecialchars',
 			'category'		=> 'sanitize_numbers',
 			'time'			=> 'sanitize_numbers',
 			'author'		=> 'sanitize_string'
@@ -334,7 +334,14 @@ function search_main($submit = '', $search_query='', $search_module = 'Articles'
 	}
 	else
 		$contents .= '';
-		
+
+	$meta_tags = array(
+		"url" => LinkToGT($link_to),
+		"title" => ""._SEARCH."".((isset($search_data['search_query']) && $search_data['search_query'] != '' && trim($search_data['search_query'])) ? " : ". $search_data['search_query']:""),
+		"description" => ((isset($search_data['search_query']) && $search_data['search_query'] != '' && trim($search_data['search_query'])) ? " : ". $search_data['search_query']:""),
+		"extra_meta_tags" => array()
+	);
+	
 	include("header.php");
 	$html_output .= show_modules_boxes($module_name, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), search_form($search_data['search_query'], $search_data['module'], $search_data['author'], $search_data['category'], $search_data['time']).$contents);
 	include("footer.php");

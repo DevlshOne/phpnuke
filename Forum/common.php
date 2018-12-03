@@ -29,6 +29,12 @@ $phpbb_class_loader->register();
 $phpbb_config_php_file = new \phpbb\config_php_file($phpbb_root_path, $phpEx);
 extract($phpbb_config_php_file->get_all());
 
+//phpnuke 8.4 start
+define("NUKE_STATISTICS", true);
+define("NUKE_PATH", $phpbb_root_path."../");
+include($phpbb_root_path."../includes/counter.php");
+//phpnuke 8.4 end
+
 if (!defined('PHPBB_ENVIRONMENT'))
 {
 	@define('PHPBB_ENVIRONMENT', 'production');

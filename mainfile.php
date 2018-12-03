@@ -367,6 +367,11 @@ else
 $users_system = new users_system();
 
 $userinfo = (isset($users_system->data) && is_array($users_system->data)) ? $users_system->data:array();
+
+if(isset($users_system->user_fields) && is_array($users_system->user_fields))
+	foreach($users_system->user_fields as $key => $val)
+		$userinfo[$key] = (isset($users_system->data[$val])) ? $users_system->data[$val]:"";
+		
 cache_system();
 
 // set common configs
@@ -596,49 +601,6 @@ if (
 	die();
 }
 
-// Additional security (Union, CLike, XSS)
-//Union Tap
-//Copyright Zhen-Xjell 2004 http://nukecops.com
-//Beta 3 Code to prevent UNION SQL Injections
-unset($matches);
-unset($loc);
-if(isset($_SERVER['QUERY_STRING'])){
-	if (@preg_match("/([OdWo5NIbpuU4V2iJT0n]{5}) /", rawurldecode($loc=$_SERVER['QUERY_STRING']), $matches))
-	{
-		die('Illegal Operation');
-	}
-}
-
-if(!isset($admin) OR (isset($admin) AND !is_admin()))
-{
-	$queryString = $_SERVER['QUERY_STRING'];
-	if (($_SERVER['PHP_SELF'] != "/index.php") OR !isset($url))
-	{
-		if (stristr($queryString,'http://')) die('Illegal Operation');
-	}
-	if (
-		(stristr($queryString,'%20union%20'))	OR 
-		(stristr($queryString,'%2f%2a'))		OR 
-		(stristr($queryString,'%2f*'))			OR 
-		(stristr($queryString,'/*'))			OR 
-		(stristr($queryString,'*/union/*'))		OR 
-		(stristr($queryString,'c2nyaxb0'))		OR 
-		(stristr($queryString,'+union+'))		OR 
-		(
-			(stristr($queryString,'cmd='))	AND 
-			(!stristr($queryString,'&cmd'))
-		)										OR 
-		(
-			(stristr($queryString,'exec'))	AND 
-			(!stristr($queryString,'execu'))
-		)										OR 
-		(stristr($queryString,'concat'))
-	)
-	{
-		die('Illegal Operation');
-	}
-}
-
 $HijriCalendar = new HijriCalendar();
 $hijri = $HijriCalendar->GregorianToHijri( _NOWTIME );
 
@@ -646,7 +608,7 @@ $hijri = $HijriCalendar->GregorianToHijri( _NOWTIME );
 ///////////////////////////////// MTSN Code Start
 if(!defined("IN_INSTALL"))
 {
-	if ( strstr($_SERVER['HTTP_USER_AGENT'], "Googlebot") == FALSE )
+	if (isset($_SERVER['HTTP_USER_AGENT']) && strstr($_SERVER['HTTP_USER_AGENT'], "Googlebot") == FALSE )
 	{
 		if (intval($nuke_configs['mtsn_status']) == 1)
 		{
@@ -733,6 +695,75 @@ if(isset($nuke_modules_cacheData) && !empty($nuke_modules_cacheData))
 	}
 }
 
+if(!defined("ADMIN_FILE") && !defined("IN_INSTALL"))
+{
+	$REQUSERURL = str_replace(array( '\\', '../' ),array( '/',  '' ),$_SERVER['REQUEST_URI']);
+	$parsed_GT_link = parse_GT_link($REQUSERURL);
+
+	if(!empty($parsed_GT_link[0]))
+	{
+		unset($_GET);
+		unset($_SERVER_QUERY_STRING);
+		$_SERVER_QUERY_STRING = array();
+		foreach($parsed_GT_link[0] as $GTkey => $GTval)
+		{
+			$_REQUEST[$GTkey] = $_GET[$GTkey] = $$GTkey = $GTval;
+			$_SERVER_QUERY_STRING[] = "".$$GTkey." = ".$GTval."";
+		}
+		if(!empty($_SERVER_QUERY_STRING))
+			$_SERVER['QUERY_STRING'] = $_SERVER['argv'][0] = implode("&",$_SERVER_QUERY_STRING);
+	}
+	
+	$nuke_configs['REQUSERURL'] = $REQUSERURL = (!empty($parsed_GT_link[1])) ? $parsed_GT_link[1]:"/";
+	$nuke_configs['noPermaLink'] = $noPermaLink = (!empty($parsed_GT_link[3])) ? $parsed_GT_link[3]:"index.php";
+
+	if(!defined("IN_INSTALL"))
+		update_blocks();
+}
+
+// Additional security (Union, CLike, XSS)
+//Union Tap
+//Copyright Zhen-Xjell 2004 http://nukecops.com
+//Beta 3 Code to prevent UNION SQL Injections
+unset($matches);
+unset($loc);
+if(isset($_SERVER['QUERY_STRING'])){
+	if (@preg_match("/([OdWo5NIbpuU4V2iJT0n]{5}) /", rawurldecode($loc=$_SERVER['QUERY_STRING']), $matches))
+	{
+		die('Illegal Operation');
+	}
+}
+
+if(!isset($admin) OR (isset($admin) AND !is_admin()))
+{
+	$queryString = $_SERVER['QUERY_STRING'];
+	if ((($_SERVER['PHP_SELF'] != "/index.php") OR !isset($url)) && !isset($timthumb) && !stristr($nuke_configs['nukeurl'], "thumb/"))
+	{
+		if (stristr($queryString,'http://')) die('Illegal Operation');
+	}
+	if (
+		(stristr($queryString,'%20union%20'))	OR 
+		(stristr($queryString,'%2f%2a'))		OR 
+		(stristr($queryString,'%2f*'))			OR 
+		(stristr($queryString,'/*'))			OR 
+		(stristr($queryString,'*/union/*'))		OR 
+		(stristr($queryString,'c2nyaxb0'))		OR 
+		(stristr($queryString,'+union+'))		OR 
+		(
+			(stristr($queryString,'cmd='))	AND 
+			(!stristr($queryString,'&cmd'))
+		)										OR 
+		(
+			(stristr($queryString,'exec'))	AND 
+			(!stristr($queryString,'execu'))
+		)										OR 
+		(stristr($queryString,'concat'))
+	)
+	{
+		die('Illegal Operation');
+	}
+}
+
 /* jrating class by iman64 */
 $jrating_Response['error'] = false;
 $jrating_Response['message'] = '';
@@ -760,48 +791,52 @@ if(isset($_POST['jaction']))
 $ALLOWED_SITES = array();
 $ALLOW_ALL_EXTERNAL_SITES = false;
 
-if(isset($timthumb) && $src != '')
+if(isset($timthumb))
 {
-	$ALLOWED_SITES = ($nuke_configs['timthumb_allowed'] != '') ? explode("\n", str_replace("\r","", $nuke_configs['timthumb_allowed'])):false;
-	
-	if(!empty($ALLOWED_SITES))
-		$ALLOW_ALL_EXTERNAL_SITES = true;
+	if(isset($src) && $src != '')
+	{
+		$ALLOWED_SITES = ($nuke_configs['timthumb_allowed'] != '') ? explode("\n", str_replace("\r","", $nuke_configs['timthumb_allowed'])):false;
 		
-	if(isset($data_image))
-	{
-		$metadata = read_media_metadata($src);
+		if(!empty($ALLOWED_SITES))
+			$ALLOW_ALL_EXTERNAL_SITES = true;
 			
-		require_once(INCLUDE_PATH."/class.simple_image.php");
-		header('Content-Type: '.$metadata['cover']['mime_type'].'');
+		if(isset($data_image))
+		{
+			$metadata = read_media_metadata($src);
+				
+			require_once(INCLUDE_PATH."/class.simple_image.php");
+			header('Content-Type: '.$metadata['cover']['mime_type'].'');
 
-		$image = new SimpleImage();
-		$image->compression = (intval($q) != 0) ? $q:90;
-		$image->load(true, $metadata['cover']['data'], $metadata['cover']['mime_type']);
-		$h = isset($h) ? $h:false;
-		$w = isset($w) ? $w:false;
-		if($h && $w)
-		{
-			$image->resize($w,$h);
+			$image = new SimpleImage();
+			$image->compression = (intval($q) != 0) ? $q:90;
+			$image->load(true, $metadata['cover']['data'], $metadata['cover']['mime_type']);
+			$h = isset($h) ? $h:false;
+			$w = isset($w) ? $w:false;
+			if($h && $w)
+			{
+				$image->resize($w,$h);
+			}
+			elseif($w && !$h)
+			{
+				$image->resizeToWidth($w);
+			}
+			elseif($h && !$w)
+			{
+				$image->resizeToHeight($h);
+			}
+			$image->output();
+			die();
 		}
-		elseif($w && !$h)
-		{
-			$image->resizeToWidth($w);
-		}
-		elseif($h && !$w)
-		{
-			$image->resizeToHeight($h);
-		}
-		$image->output();
-		die();
-	}
-	else
-	{
-		if(PHPNUKE_ROOT_MAIN_PATH != '')
-			define ('LOCAL_FILE_BASE_DIRECTORY', str_replace("/".PHPNUKE_ROOT_MAIN_PATH, "", $nuke_root));
 		else
-			define ('LOCAL_FILE_BASE_DIRECTORY', $nuke_root);
-		include(INCLUDE_PATH."/class.timthumb.php");
+		{
+			if(PHPNUKE_ROOT_MAIN_PATH != '')
+				define ('LOCAL_FILE_BASE_DIRECTORY', str_replace("/".PHPNUKE_ROOT_MAIN_PATH, "", $nuke_root));
+			else
+				define ('LOCAL_FILE_BASE_DIRECTORY', $nuke_root);
+			include(INCLUDE_PATH."/class.timthumb.php");
+		}
 	}
+	die();
 }
 
 if(isset($_REQUEST['captcha']) && isset($_REQUEST['id']) && $_REQUEST['id'] != '')
@@ -871,28 +906,6 @@ if(isset($_REQUEST['captcha']) && isset($_REQUEST['id']) && $_REQUEST['id'] != '
 	die();
 }
 
-if(!defined("ADMIN_FILE") && !defined("IN_INSTALL"))
-{
-	$REQUSERURL = str_replace(array( '\\', '../' ),array( '/',  '' ),$_SERVER['REQUEST_URI']);
-	$parsed_GT_link = parse_GT_link($REQUSERURL);
-
-	if(!empty($parsed_GT_link[0]))
-	{
-		unset($_GET);
-		
-		foreach($parsed_GT_link[0] as $GTkey => $GTval)
-		{
-			$_REQUEST[$GTkey] = $_GET[$GTkey] = $$GTkey = $GTval;
-		}
-	}
-	
-	$nuke_configs['REQUSERURL'] = $REQUSERURL = (!empty($parsed_GT_link[1])) ? $parsed_GT_link[1]:"/";
-	$nuke_configs['noPermaLink'] = $noPermaLink = (!empty($parsed_GT_link[3])) ? $parsed_GT_link[3]:"index.php";
-
-	if(!defined("IN_INSTALL"))
-		update_blocks();
-}
-
 suspend_site_show();
 
 $sop = (isset($sop)) ? filter($sop, "nohtml"):"";
@@ -911,4 +924,12 @@ if($sop != '')
 	die();
 }
 
+$plugin_files = get_dir_list(INCLUDE_PATH.'/plugins', 'files');
+if(!empty($plugin_files))
+{
+	define("PLUGIN_FILE", true);
+	foreach($plugin_files as $plugin_file)
+		if(file_exists(INCLUDE_PATH."/plugins/".$plugin_file))
+			@include(INCLUDE_PATH."/plugins/".$plugin_file);
+}
 ?>

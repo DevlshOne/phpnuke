@@ -18,6 +18,8 @@ if (!defined('CONFIG_FUNCTIONS_FILE')) {
 
 function parse_rss_link($matches)
 {
+	if(isset($matches[1]) && $matches[1] == 'back')
+		return 'feedback/';
 	if(isset($matches[1]))
 		parse_str($matches[1], $output);
 	$return = '';

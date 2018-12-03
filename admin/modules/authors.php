@@ -141,7 +141,7 @@ if (check_admin_permission($filename, true))
 					$phone = stripslashes($row['phone']);
 					$admlanguage = $row['admlanguage'];
 					$radminsuper = $row['radminsuper'];
-					$a_aid = strtolower(substr("$a_aid", 0,25));
+					$a_aid = substr("$a_aid", 0,25);
 					$name = substr("$name", 0,50);
 					if ($name == "God")
 					{
@@ -454,7 +454,7 @@ if (check_admin_permission($filename, true))
 			$contents .= "<div class=\"text-center\"><font class=\"option\"><b>" . _EDIT_ADMIN . "</b></font></div><br><br>";
 			$adm_aid = filter($chng_aid, "nohtml");
 			$adm_aid = trim($adm_aid);
-			$adm_aid = strtolower(substr("$adm_aid", 0,25));
+			$adm_aid = substr("$adm_aid", 0,25);
 			
 			$chng_name = filter($nuke_authors_cacheData[$adm_aid]['name'], "nohtml");
 			$chng_realname = filter($nuke_authors_cacheData[$adm_aid]['realname'], "nohtml");
@@ -474,7 +474,7 @@ if (check_admin_permission($filename, true))
 						<td><input type=\"text\" name=\"author_fields[chng_realname]\" value=\"$chng_realname\" class=\"inp-form\"> <font class=\"tiny\">" . _REQUIRED . "</font></td>
 					</tr>
 					<tr>
-						<th>" . _NICKNAME . "</th>
+						<th>" . _USERNAME . "</th>
 						<td><input type=\"text\" name=\"author_fields[chng_aid]\" value=\"$adm_aid\" size=\"30\" maxlength=\"25\" class=\"inp-form-ltr\"> <font class=\"tiny\">" . _REQUIRED . "</font></td>
 					</tr>
 					<tr>
@@ -662,7 +662,7 @@ if (check_admin_permission($filename, true))
 				extract($author_fields);
 			$sql_qrray = array();
 			$chng_aid = trim($chng_aid);
-			$chng_aid = strtolower(substr("$chng_aid", 0,25));
+			$chng_aid = substr("$chng_aid", 0,25);
 
 			if (!($chng_aid && $chng_name && $chng_email))
 			{
@@ -698,7 +698,7 @@ if (check_admin_permission($filename, true))
 			{
 				$db->query("update ".ARTICLES_TABLE." set aid=?, informant = IF(informant = ?, ?, informant) where aid = ?", [$chng_aid, $adm_aid, $chng_aid, $adm_aid]);
 			}
-			$sql_qrray['radminsuper'] = 0;
+			$sql_qrray['radminsuper'] = (is_God($adm_aid) && $chng_name == 'God') ? 1:0;
 			
 			if(isset($chng_radminsuper))
 			{
@@ -837,7 +837,7 @@ if (check_admin_permission($filename, true))
 		if(isset($author_fields) && !empty($author_fields))
 			extract($author_fields);
 		
-		$add_aid = strtolower(substr("$add_aid", 0,25));
+		$add_aid = substr("$add_aid", 0,25);
 		$pagetitle = _ADD_ADMIN." : $add_aid";
 		$contents = '';
 		if (!($add_aid && $add_email && $add_pwd))

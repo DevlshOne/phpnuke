@@ -412,7 +412,7 @@ function cache_system($mode = "", $extra_code=array())
 				{
 					$main_word = $row['main_word'];
 					unset($row['main_word']);
-					$nuke_languages[$main_word] = array("lid" => intval($row['lid']), "equals" => (($row['equals'] != "") ? phpnuke_unserialize($row['equals']):array()));
+					$nuke_languages[$main_word] = array("lid" => intval($row['lid']), "equals" => (($row['equals'] != "") ? phpnuke_unserialize(stripslashes($row['equals'])):array()));
 				}
 				unset($results);
 			}
@@ -846,8 +846,10 @@ function makePass($cid, $custum_options = array(), $google_recaptcha = false)
 function code_check($security_code, $security_code_id, $google_recaptcha = false)
 {
 	global $nuke_configs, $visitor_ip;
-	if(isset($_POST['g-recaptcha-response']) && $_POST['g-recaptcha-response'] != '' && $nuke_configs['google_recaptcha_sitekey'] != '' && $nuke_configs['google_recaptcha_secretkey'] != '' && ($nuke_configs['seccode_type'] == 2 || $google_recaptcha))
+	if(isset($_POST['g-recaptcha-response']) && $nuke_configs['google_recaptcha_sitekey'] != '' && $nuke_configs['google_recaptcha_secretkey'] != '' && ($nuke_configs['seccode_type'] == 2 || $google_recaptcha))
 	{
+		if($_POST['g-recaptcha-response'] == '')
+			return false;
 		$g_recaptcha_response = filter($_POST['g-recaptcha-response'], "nohtml");
 		if (function_exists('curl_version'))
 		{
@@ -1101,7 +1103,7 @@ function simple_output($message)
 // outputs functions
 
 // db functions
-function get_unique_post_slug($table, $id_name, $id_value, $field, $slug, $post_status = '', $ajax=false)
+function get_unique_post_slug($table, $id_name, $id_value, $field, $slug, $post_status = '', $ajax=false, $where = '')
 {
 	$slug = sanitize(str2url($slug));
 	if (in_array($post_status, array( 'draft', 'pending' )))
@@ -1116,7 +1118,7 @@ function get_unique_post_slug($table, $id_name, $id_value, $field, $slug, $post_
 	$original_slug = $slug;
 
 	// Post slugs must be unique across all posts.
-	$result = $db->query("SELECT $field FROM $table WHERE $field = '$slug'".(($id_value != 0) ? " AND $id_name != '$id_value'":"")." LIMIT 1");
+	$result = $db->query("SELECT $field FROM $table WHERE $field = '$slug'".(($id_value != 0) ? " AND $id_name != '$id_value'":"")." $where LIMIT 1");
 	
 	$post_name_check = intval($result->count());
 
@@ -1126,7 +1128,7 @@ function get_unique_post_slug($table, $id_name, $id_value, $field, $slug, $post_
 		do
 		{
 			$alt_post_name = _truncate_post_slug($slug, 200-(strlen($suffix)+1))."-$suffix";
-			$result2 = $db->query("SELECT $field FROM $table WHERE $field = '$alt_post_name'".(($id_value != 0) ? " AND $id_name != '$id_value'":"")." LIMIT 1");
+			$result2 = $db->query("SELECT $field FROM $table WHERE $field = '$alt_post_name'".(($id_value != 0) ? " AND $id_name != '$id_value' $where":"")." LIMIT 1");
 			$post_name_check = intval($result2->count());
 			$suffix++;
 		}
@@ -1672,7 +1674,7 @@ function phpnuke_check_password($password, $hash)
 	global $phpnuke_hasher;
 
 	// If the hash is still md5...
-	if ( strlen($hash) <= 32 )
+	if ( strlen($hash) <= 32 && $hash != '' && $hash !== null)
 	{
 		$check = hash_equals( $hash, md5( $password ) );
 
@@ -1784,6 +1786,7 @@ function wysiwyg_textarea($name, $value, $config = 'basic', $cols = 50, $rows = 
 				$extraPlugins		= array("autogrow","centering_image","codesnippet","html5audio","video");
 				$plugins_configs	= array(
 					"codeSnippet_theme: 'monokai_sublime'",
+					"image_prefillDimensions: false",
 					 "'filebrowserFlashBrowseUrl': '".$admin_file.".php?op=media_browser&ckeditor=true'",
 					 "'filebrowserImageBrowseUrl': '".$admin_file.".php?op=media_browser&ckeditor=true'",
 					 //"'filebrowserFlashUploadUrl': 'imgupload.php'",
@@ -3271,13 +3274,13 @@ function LinkToGT($link)
 			}
 		}
 
-		if(!@stristr($link, "http://")){
+		if(substr($link, 0, 7) != "http://" && substr($link, 0, 8) != "https://" && substr($link, 0, 6) != "ftp://"){
 			$friendly_link = $nuke_configs['nukeurl'].$friendly_link;
 		}
 		return $friendly_link; 
 	}else{
 		$friendly_link = str_replace("&","&amp;",$link);
-		if(!@stristr($link, "http://")){
+		if(substr($link, 0, 7) != "http://" && substr($link, 0, 8) != "https://" && substr($link, 0, 6) != "ftp://"){
 			$friendly_link = (isset($nuke_configs['nukeurl'])) ? $nuke_configs['nukeurl'].$friendly_link:$friendly_link;
 		}
 		return $friendly_link; 
@@ -3396,6 +3399,98 @@ function parse_phpnuke_main($matches)
 	return $return;
 }
 
+function parse_timthumbs_str($matches)
+{
+	parse_str($matches[1], $output);
+
+	$src = "";
+	$urls = array();
+	$dims = array();
+	foreach($output as $key => $val)
+	{
+		if($key == "src")
+			$src = $val;
+		if($key == "w")
+			$dims[0] = $val;
+		if($key == "h")
+			$dims[1] = $val;
+		if($key == "q")
+			$urls[] ="q-$val";
+		if($key == "a")
+			$urls[] ="a-$val";
+		if($key == "zc")
+			$urls[] ="zc-$val";
+		if($key == "f")
+			$urls[] ="f-$val";
+		if($key == "s")
+			$urls[] ="s-$val";
+		if($key == "cc")
+			$urls[] ="cc-$val";
+		if($key == "ct")
+			$urls[] ="ct-$val";
+	}
+	if(!empty($dims) && isset($dims[0]) && $dims[0] != 0 && isset($dims[1]) && $dims[1] != 0)
+		$urls[] .= "$dims[0]×$dims[1]";
+	
+	$url = ($src != '') ? ("thumbs/".((!empty($urls)) ? "".implode("/", $urls)."/":"").$src):"";
+	return $url;
+}
+
+function parse_timthumbs_args($matches)
+{
+	$inputs = explode("/", $matches[1]);
+	
+	$url = "index.php?timthumb=true";
+	foreach($inputs as $key => $val)
+	{
+		$val = str_replace("%C3%97", "×", $val);
+		if(stristr($val, "×"))
+		{
+			$val = explode("×", $val);
+			$url .="&w=".intval($val[0])."&h=".intval($val[1])."";
+			unset($inputs[$key]);
+		}
+		elseif(in_array($val, array("c", "t", "l", "r", "b", "tl", "tr", "bl", "br")))
+		{
+			$url .="&a=$val";
+			unset($inputs[$key]);
+		}
+		elseif(substr($val, 0, 2) == "q-")
+		{
+			$url .="&q=".intval(str_replace("q-","", $val));
+			unset($inputs[$key]);
+		}
+		elseif(substr($val, 0, 3) == "zc-")
+		{
+			$url .="&zc=".intval(str_replace("zc-","", $val));
+			unset($inputs[$key]);
+		}
+		elseif(substr($val, 0, 2) == "f-")
+		{
+			$url .="&f=".str_replace("f-","", $val);
+			unset($inputs[$key]);
+		}
+		elseif(substr($val, 0, 2) == "f-")
+		{
+			$url .="&s=".str_replace("s-","", $val);
+			unset($inputs[$key]);
+		}
+		elseif(substr($val, 0, 3) == "cc-")
+		{
+			$url .="&cc=".str_replace("cc-","", $val);
+			unset($inputs[$key]);
+		}
+		elseif(substr($val, 0, 3) == "ct-")
+		{
+			$url .="&ct=".str_replace("ct-","", $val);
+			unset($inputs[$key]);
+		}		
+	}
+	if(!empty($inputs))
+		$url .= "&src=".implode("/", $inputs);
+
+	return $url;
+}
 if(!function_exists('get_headers'))
 {
     function get_headers($url,$format=0)
@@ -3936,7 +4031,7 @@ function report_friend_form($submit = false, $mode = 'friend', $post_id = '', $p
 		$post_link = LinkToGT($post_link);
 		$report_firnd_form = ($mode == 'friend') ? "friend_form":"report_form";
 		$header_of_form = ($mode == 'friend') ? _INTRODUCE_TO_FRIENDS:_PROBLEM_REPORT;
-		$text_of_alert_form = ($mode == 'friend') ? "<div class=\"alert alert-info\">".sprintf(_INTRODUCE_AN_ARTICLE_TO_FRIENDS, $post_title)."</div>":"<div class=\"alert alert-danger\">".spreintf(_REPORT_AN_ARTICLE_TO_FRIENDS,$post_title)."</div>";
+		$text_of_alert_form = ($mode == 'friend') ? "<div class=\"alert alert-info\">".sprintf(_INTRODUCE_AN_ARTICLE_TO_FRIENDS, $post_title)."</div>":"<div class=\"alert alert-danger\">".sprintf(_REPORT_AN_ARTICLE_TO_FRIENDS,$post_title)."</div>";
 		
 		if(function_exists("$report_firnd_form"))
 			echo $report_firnd_form($post_id, $post_title, $module_name, $message, $post_link, $friend_name, $friend_email);
@@ -4726,7 +4821,7 @@ function category_link($module_name, $cat_title, $attrs=array(), $link_mode=1)
 		
 		if($catid < 0) break;
 		
-		$cattext = filter($nuke_categories_cacheData[$module_name][$catid]['cattext'], "nohtml");
+		$cattext = filter(category_lang_text($nuke_categories_cacheData[$module_name][$catid]['cattext']), "nohtml");
 		$catname = filter($nuke_categories_cacheData[$module_name][$catid]['catname'], "nohtml");
 		$catname_url = filter($nuke_categories_cacheData[$module_name][$catid]['catname_url'], "nohtml");
 		$module = filter($nuke_categories_cacheData[$module_name][$catid]['module'], "nohtml");
@@ -4747,6 +4842,23 @@ function category_link($module_name, $cat_title, $attrs=array(), $link_mode=1)
 	}
 	
 	return $cats_link_deep;
+}
+
+function category_lang_text($cattext)
+{
+	global $nuke_configs;
+	
+	if($cattext != '')
+	{
+		$cattext_arr = phpnuke_unserialize(stripslashes($cattext));
+		
+		if(isset($cattext_arr[$nuke_configs['currentlang']]))
+			return $cattext_arr[$nuke_configs['currentlang']];
+		else
+			return $cattext;
+	}
+	else
+		return '';
 }
 
 class categories_list
@@ -4897,7 +5009,7 @@ function pn_nav_menu($args = array())
 				}
 				
 				$title = filter($nav_menu_data['title'],"nohtml");
-				$url = filter($nav_menu_data['url'],"nohtml");
+				$url = LinkToGT($nav_menu_data['url']);
 				$type = filter($nav_menu_data['type'],"nohtml");
 				$module = filter($nav_menu_data['module'],"nohtml");
 				$part_id = intval($nav_menu_data['part_id']);
@@ -5649,6 +5761,40 @@ function mres($value)
     return str_replace($search, $replace, $value);
 }
 
+function smilies_parse($text, $generate = false)
+{
+	global $nuke_configs;
+	
+	$smilies_configs = ($nuke_configs['smilies'] != '') ? phpnuke_unserialize(stripslashes($nuke_configs['smilies'])):array();
+
+	if(!empty($smilies_configs))
+	{
+		foreach($smilies_configs as $smilie_data)
+		{
+			$smilie_data = array_filter($smilie_data);
+			if(empty($smilie_data))
+				continue;
+				
+			$smilie_name = $smilie_data['name'];
+			$option_code = $smilie_data['code'];
+			$option_url = $smilie_data['url'];
+			$option_dimentions = $smilie_data['dimentions'];
+			$option_dimentions = explode("*", $option_dimentions);
+			$option_dimentions_w = $option_dimentions[0];
+			$option_dimentions_h = $option_dimentions[1];
+
+			if($generate)
+				$text .="<a href=\"javascript:Smiles('$option_code')\"><img src=\"".LinkToGT($option_url)."\" border=0 alt='$option_code' height=\"$option_dimentions_h\" width=\"$option_dimentions_w\" title=\"$smilie_name\"></a> ";
+			else
+			{
+				$img_code = "<img src=\"".LinkToGT($option_url)."\" border=0 alt='$option_code' height=\"$option_dimentions_h\" width=\"$option_dimentions_w\" title=\"$smilie_name\"></a>";
+				$text = str_replace("$option_code ", "$img_code ", $text);
+				$text = str_replace(" $option_code", " $img_code", $text);
+			}
+		}
+	}
+	return $text;
+}
 // filter functions
 
 
@@ -5714,6 +5860,7 @@ function get_dir_list($path, $options='folders', $sort=false)
 {
 	$path = trim($path, "/");
 	$handle=opendir($path);
+	$dir_list = array();
 	while ($file = readdir($handle))
 	{
 		if($file != "." && $file != ".." && $file != "")
@@ -5734,12 +5881,15 @@ function get_dir_list($path, $options='folders', $sort=false)
 	}
 
 	closedir($handle);
-	$dir_list = array_filter($dir_list);
+	if(!empty($dir_list))
+	{
+		$dir_list = array_filter($dir_list);
 
-	if($sort)
-		sort($dir_list);
+		if($sort)
+			sort($dir_list);
+	}
+	
 	return $dir_list;
-
 }
 
 function get_languages_data($mode="")

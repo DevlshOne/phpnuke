@@ -282,7 +282,7 @@ function articles_feed($module_args=array())
 				foreach($cats as $cat)
 				{
 					if(isset($nuke_articles_categories_cacheData[$cat]))
-						$feed_data[$row_count]['category'][] = filter($nuke_articles_categories_cacheData[$cat]['cattext'], "nohtml");
+						$feed_data[$row_count]['category'][] = filter(category_lang_text($nuke_articles_categories_cacheData[$cat]['cattext']), "nohtml");
 				}
 			
 			$row_count++;
@@ -294,7 +294,7 @@ function articles_feed($module_args=array())
 
 function get_article_image($sid = 0, $article_image = '', $hometext = '')
 {
-	preg_match_all('#<img(.*)src=["|\'](.*)["|\']#isU', $hometext, $images_match);
+	preg_match_all('#<img(.*)src=["|\'](.*)["|\']#isU', stripslashes($hometext), $images_match);
 	if($article_image == '')
 		if(file_exists("files/Articles/".$sid.".jpg"))
 			$article_image = "files/Articles/".$sid.".jpg";
@@ -317,7 +317,7 @@ if(!function_exists("articles_search"))
 		<div class=\"panel panel-info\">
 			<div class=\"panel-heading\"> <span class=\"glyphicon glyphicon-list-alt\"></span><b> <a href=\"".$row['link']."\">".$row['title']."</a></b></div>
 			<div class=\"panel-body\">
-				".$row['hometext']."
+				".stripslashes($row['hometext'])."
 			</div>
 		</div>";
 		return $contents;	

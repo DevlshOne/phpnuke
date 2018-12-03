@@ -177,7 +177,7 @@ $article_info['article_pass']	= ($row['article_pass'] != '') ? md5($row['article
 $article_info['likes']			= intval($row['likes']);
 $article_info['dislikes']		= intval($row['dislikes']);
 $article_info['datetime']		= nuketimes($article_info['time']);
-$article_info['article_image']	= get_article_image($article_info['sid'], $row['article_image'], $hometext);
+$article_info['article_image']	= get_article_image($article_info['sid'], $row['article_image'], $row['hometext']);
 $article_info['rated_id']	= intval($row['rated_id']);
 if(!empty($article_info['cats']))
 {
@@ -185,7 +185,7 @@ if(!empty($article_info['cats']))
 	{
 		if(!isset($nuke_articles_categories_cacheData[$cat])) continue;
 		$article_info['cats_data'][$cat]		= array(
-			"cattext"			=> filter($nuke_articles_categories_cacheData[$cat]['cattext'], "nohtml"),
+			"cattext"			=> filter(category_lang_text($nuke_articles_categories_cacheData[$cat]['cattext']), "nohtml"),
 			"catname"			=> filter($nuke_articles_categories_cacheData[$cat]['catname'], "nohtml"),
 			"catimage"			=> filter($nuke_articles_categories_cacheData[$cat]['catimage'], "nohtml"),
 			"catlink"			=> LinkToGT("index.php?modname=Articles&category=".filter($nuke_articles_categories_cacheData[$cat]['catname_url'], "nohtml")),
@@ -213,13 +213,14 @@ if ($pn_Cookies->exists('Articles_ratecookie'))
 if($article_info['rated_id'] > 0)
 	$disabled_rating	= true;
 
+$article_info['disabled_rating']	= $disabled_rating;
 $article_info['rating_box']		= rating_load($article_info['score'], $article_info['ratings'], $article_info['likes'], $article_info['dislikes'], 'Articles', "sid", $article_info['sid'], $disabled_rating, $votetype);
 
 
 			
 if(isset($nuke_articles_categories_cacheData[$article_info['cat_link']]))
 {
-	$article_info['cattext_link']		= filter($nuke_articles_categories_cacheData[$article_info['cat_link']]['cattext'], "nohtml");
+	$article_info['cattext_link']		= filter(category_lang_text($nuke_articles_categories_cacheData[$article_info['cat_link']]['cattext']), "nohtml");
 	$article_info['catname_link']		= filter($nuke_articles_categories_cacheData[$article_info['cat_link']]['catname'], "nohtml");
 	$article_info['catimage_link']		= filter($nuke_articles_categories_cacheData[$article_info['cat_link']]['catimage'], "nohtml");
 }
@@ -323,9 +324,6 @@ $meta_tags = array(
 switch($op)
 {
 	default:
-		include("header.php");
-		unset($meta_tags);
-		$contents = '';
 		$GLOBALS['block_global_contents'] = $article_info;
 		$GLOBALS['block_global_contents']['post_id'] = $article_info['sid'];
 		$GLOBALS['block_global_contents']['post_title'] = $article_info['title'];
@@ -334,17 +332,24 @@ switch($op)
 		$GLOBALS['block_global_contents']['db_table'] = ARTICLES_TABLE;
 		$GLOBALS['block_global_contents']['db_id'] = 'sid';
 		
+		$contents = '';
 		if(file_exists("themes/".$nuke_configs['ThemeSel']."/article_more.php"))
 			include("themes/".$nuke_configs['ThemeSel']."/article_more.php");
 		elseif(function_exists("article_more"))
 			$contents .= article_more($article_info);
 		else 
 			$contents .= "";
-	
-		$html_output .= show_modules_boxes($module_name, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
+			
+		$boxes_contents = show_modules_boxes($module_name, array("bottom_full", "top_full","left","top_middle","bottom_middle","right"), $contents);
+		
+		include("header.php");
+		
+		unset($meta_tags);
 		
 		unset($GLOBALS['block_global_contents']);
 		unset($article_info);
+		
+		$html_output .= $boxes_contents;
 		include ("footer.php");
 	break;
 	
